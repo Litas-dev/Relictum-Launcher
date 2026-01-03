@@ -1,0 +1,50 @@
+{
+  "name": "azeroth-legacy-launcher",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Unofficial Azeroth Legacy Launcher",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Litas-dev/Azeroth-Legacy-Launcher.git"
+  },
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5174 && electron .\"",
+    "build": "vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "7zip-bin": "^5.2.0",
+    "adm-zip": "^0.5.16",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.292.0",
+    "node-7z": "^3.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "webtorrent": "^2.8.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "vite": "^5.0.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.azerothlegacy.launcher",
+    "productName": "Azeroth Legacy Launcher",
+    "directories": {
+      "output": "dist_v3.0.0_final"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist_renderer/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    }
+  }
+}

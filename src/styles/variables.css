@@ -1,0 +1,12 @@
+:root {
+  --primary-gold: #cda558;
+  --primary-rgb: 205, 165, 88;
+  --text-gold: #cda558;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --bg-dark: #0b0c10;
+  --bg-panel: #15171c;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --accent-red: #fb7185;
+  --success-green: #22c55e;
+}

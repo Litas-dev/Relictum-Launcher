@@ -1,0 +1,290 @@
+/* --- Game View --- */
+.game-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  animation: fadeIn 0.3s ease-out;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.game-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.game-art-wrapper {
+  /* Apply glow to the wrapper so clip-path on image doesn't cut it off */
+  filter: drop-shadow(0 0 20px rgba(0,0,0,0.5));
+  transition: transform 0.3s;
+}
+
+.game-art-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.game-header-art {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* Filter moved to wrapper */
+  transition: transform 0.3s;
+  /* Fix for blue artifact lines on edges of images + Round Corners */
+  clip-path: inset(2px round 20px);
+  transform: scale(1.01);
+}
+
+/* Removed hover scale from image as it's now on wrapper to keep sync */
+/* .game-header-art:hover {
+  transform: scale(1.02);
+} */
+
+.game-info-actions {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.play-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.play-button-large {
+  background: var(--primary-gold);
+  color: black;
+  border: none;
+  padding: 16px 60px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.play-button-large:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(var(--primary-rgb), 0.6);
+  background: #deb86e;
+}
+
+.install-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.install-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.install-button-large {
+  background: rgba(var(--primary-rgb), 0.15);
+  border: 1px solid var(--primary-gold);
+  color: var(--primary-gold);
+  padding: 15px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.install-button-large:hover {
+  background: rgba(var(--primary-rgb), 0.25);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2);
+}
+
+.divider-text {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.locate-button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 12px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.locate-button:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Game Details Grid */
+.game-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+  width: 100%;
+}
+
+.detail-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+}
+
+.detail-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 1px;
+}
+
+.detail-card p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.path-text {
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+.remove-path-btn {
+  background: rgba(225, 29, 72, 0.1);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  color: #fb7185;
+  font-size: 11px;
+  margin-top: 10px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.remove-path-btn:hover {
+  background: rgba(225, 29, 72, 0.2);
+  border-color: rgba(225, 29, 72, 0.6);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.15);
+}
+
+/* --- Version Selector Styles --- */
+.version-selector-container {
+    width: 100%;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.version-options {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+}
+
+.version-option {
+    padding: 8px 16px;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+.version-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.version-option.active {
+    background: rgba(40, 255, 60, 0.1);
+    border-color: #28ff3c;
+    color: white;
+    box-shadow: 0 2px 10px rgba(40, 255, 60, 0.1);
+}
+
+/* Specific TBC Green Theme Override */
+.game-view[data-game="tbc"] .version-option:hover {
+    background: rgba(40, 255, 60, 0.05);
+    color: #fff;
+}
+
+.game-view[data-game="tbc"] .version-option.active {
+    background: linear-gradient(135deg, rgba(40, 255, 60, 0.15) 0%, rgba(20, 100, 30, 0.2) 100%);
+    border-color: #28ff3c;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(40, 255, 60, 0.2);
+}
+
+.game-view[data-game="tbc"] .version-option.active .check-icon {
+    color: #28ff3c;
+}
+
+.version-number {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
+}
+
+.check-icon {
+    color: #28ff3c;
+    transition: all 0.2s ease;
+}

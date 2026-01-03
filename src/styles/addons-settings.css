@@ -1,0 +1,772 @@
+/* --- Addons & Settings Views --- */
+.addons-view {
+  background: rgba(21, 23, 28, 0.8);
+  border-radius: 8px;
+  padding: 30px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.3s ease-out;
+  overflow: hidden; /* Prevent container scroll, let content scroll */
+  flex: 1; /* Ensure it fills the remaining width */
+  width: 100%; /* Force full width */
+  box-sizing: border-box;
+}
+
+.settings-view {
+  background: rgba(21, 23, 28, 0.8);
+  border-radius: 8px;
+  padding: 30px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.3s ease-out;
+  overflow-y: auto; /* Allow settings to scroll */
+  flex: 1; /* Ensure it fills the remaining width */
+  width: 100%; /* Force full width */
+  box-sizing: border-box;
+}
+
+.addons-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    width: 100%; /* Ensure content takes full width */
+}
+
+.addons-list-container {
+    flex: 1;
+    overflow-y: scroll; /* Always show scrollbar track to prevent layout shift */
+    padding-right: 10px; /* Space for scrollbar */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%; /* Ensure list takes full width */
+}
+
+/* Custom Scrollbar for list */
+.addons-list-container::-webkit-scrollbar, .settings-view::-webkit-scrollbar {
+    width: 8px;
+}
+.addons-list-container::-webkit-scrollbar-track, .settings-view::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+.addons-list-container::-webkit-scrollbar-thumb, .settings-view::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.addons-list-container::-webkit-scrollbar-thumb:hover, .settings-view::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 20px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.view-header h2, .settings-view h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  color: var(--text-gold);
+}
+
+.addon-tabs {
+  display: flex;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-gold);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.addon-item {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.2s;
+}
+
+.addon-item:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.addon-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-gold);
+}
+
+.addon-info {
+    flex: 1;
+    min-width: 0; /* Enable text truncation */
+}
+
+.addon-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.addon-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.addon-version {
+    font-size: 11px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.addon-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.addon-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.install-btn {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary-gold);
+    border: 1px solid rgba(var(--primary-rgb), 0.5);
+}
+
+.install-btn:hover {
+    background: var(--primary-gold);
+    color: #1a1c21;
+    border-color: var(--primary-gold);
+}
+
+.delete-btn {
+    background: rgba(251, 113, 133, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(251, 113, 133, 0.3);
+}
+
+.delete-btn:hover {
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+}
+
+.install-btn-small {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary-gold);
+    border: 1px solid rgba(var(--primary-rgb), 0.5);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 85px;
+}
+
+.install-btn-small:hover {
+    background: var(--primary-gold);
+    color: #1a1c21;
+    border-color: var(--primary-gold);
+}
+
+.install-btn-small.installed {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    cursor: default;
+}
+
+.install-btn-small.installed:disabled {
+    opacity: 1;
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.15);
+    border-color: rgba(46, 204, 113, 0.3);
+}
+
+.install-btn-small.installed:hover {
+    background: rgba(46, 204, 113, 0.15);
+    border-color: rgba(46, 204, 113, 0.3);
+    color: #2ecc71;
+}
+
+.install-btn-small:disabled:not(.installed) {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+.view-btn-small {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.view-btn-small:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #60a5fa;
+}
+
+.sort-select {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sort-select:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+.sort-select option {
+    background: #1a1c21;
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+/* Settings Section Styles */
+.settings-section {
+    margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.settings-section h3 {
+    color: var(--text-gold);
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Toggle Switch Styles */
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+}
+
+.toggle-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toggle-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.toggle-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--success-green);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+
+
+.about-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.app-version {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.version-tag {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary-gold);
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--primary-rgb), 0.3);
+}
+
+.source-note {
+    background: rgba(var(--primary-rgb), 0.1);
+    border-left: 3px solid var(--primary-gold);
+    padding: 15px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 30px;
+}
+
+.sources-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.source-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.2s;
+}
+
+.source-item:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.source-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.source-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.source-game {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.source-origin {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.source-link {
+    color: var(--primary-gold);
+    text-decoration: none;
+}
+
+.source-link:hover {
+    text-decoration: underline;
+}
+
+.source-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+.legal-disclaimer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+}
+
+/* --- Missing Addon Styles (Restored) --- */
+
+.addon-row {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  transition: all 0.2s;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.addon-row:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.addon-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.addon-author {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.addon-status {
+    font-size: 12px;
+    color: var(--success-green);
+}
+
+.addon-modules-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.addons-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.primary-btn {
+    background: var(--primary-gold);
+    color: #1a1c21;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.primary-btn:hover {
+    background: #e6c200;
+    transform: translateY(-1px);
+}
+
+.primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.addon-count {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.delete-btn-small {
+    background: rgba(251, 113, 133, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(251, 113, 133, 0.3);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-btn-small:hover {
+    background: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 8px 10px 8px 34px;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    border-color: var(--primary-gold);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.version-badge {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+/* Addon Modal Styles */
+.addon-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.addon-modal {
+  background: #1a1b1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.addon-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.addon-modal-title h3 {
+  margin: 0 0 4px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.addon-author {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.addon-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addon-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.addon-modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.addon-modal-image {
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.addon-modal-modules {
+    margin-top: 20px;
+}
+
+.addon-modal-modules h4 {
+    color: var(--text-gold);
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.modules-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.module-tag {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
