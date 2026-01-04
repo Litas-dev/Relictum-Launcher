@@ -21,7 +21,16 @@ It is the first private server launcher to feature **Advanced Integrity Verifica
 
 ## ✨ Key Features
 
-### 🛡️ Security & Integrity (New in v3.0)
+### � Interface Preview
+
+<div align="center">
+  <img src="src/assets/1.12.png" width="30%" alt="Classic Client Interface" />
+  <img src="src/assets/2.4.3.png" width="30%" alt="TBC Client Interface" />
+  <img src="src/assets/3.3.5.png" width="30%" alt="WotLK Client Interface" />
+</div>
+<br/>
+
+### �🛡️ Security & Integrity (New in v3.0)
 *   **ASAR Code Verification**: Unlike standard launchers that only check the `.exe`, we verify the cryptographic hash of the internal `app.asar` code archive.
 *   **Real-Time Dashboard**: A dedicated security status card in the "About" section provides instant feedback (Secure/Warning/Danger).
 *   **Active Threat Monitoring**: Immediate visual alerts on the sidebar if any integrity mismatch is detected.
@@ -95,16 +104,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4.  Push to the Branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
 
-<<<<<<< HEAD
 ## ⚠️ Disclaimer
 
 This project is an unofficial fan creation and is not affiliated with, endorsed, sponsored, or specifically approved by any official game studio. All trademarks are property of their respective owners.
-=======
-
-## ⚠️ Disclaimer
-
-This project is an unofficial fan creation and is not affiliated with, endorsed, sponsored, or specifically approved by Warmane or Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment.
->>>>>>> b632c8f99d9ea8097d83f459e6ad7d2ded98e378
 
 ## 📄 License
 
