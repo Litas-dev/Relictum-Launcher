@@ -1,12 +1,18 @@
 import React from 'react';
 import styles from './Dashboard.module.css';
 import { games } from '../../config/games';
+import ipcRenderer from '../../utils/ipc';
+import { Users, ExternalLink } from 'lucide-react';
 
 const Dashboard = ({ games, onGameSelect }) => {
   // Helper: Retrieve game icon from configuration
   const getGameIcon = (id) => {
     const game = games.find(g => g.id === id);
     return game ? game.clientIcon : null;
+  };
+
+  const handleJoinCommunity = () => {
+    ipcRenderer.send('open-external', 'https://www.reddit.com/r/AzerothLegacy/');
   };
 
   const classicIco = getGameIcon('classic');
