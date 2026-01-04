@@ -333,6 +333,44 @@ ipcMain.handle('select-directory', async () => {
     return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
 });
 
+ipcMain.handle('get-game-version', async (event, gamePath) => {
+    try {
+        if (!gamePath || !fs.existsSync(gamePath)) return null;
+        
+        // Only Windows supports getting version info this way easily
+        if (process.platform === 'win32') {
+             // Use PowerShell to get the ProductVersion
+             const powershellCommand = `(Get-Item "${gamePath}").VersionInfo.ProductVersion`;
+             
+             return new Promise((resolve) => {
+                 const ps = spawn('powershell.exe', ['-NoProfile', '-Command', powershellCommand]);
+                 let output = '';
+                 
+                 ps.stdout.on('data', (data) => {
+                     output += data.toString();
+                 });
+                 
+                 ps.on('close', (code) => {
+                     if (code === 0) {
+                         resolve(output.trim());
+                     } else {
+                         resolve(null);
+                     }
+                 });
+                 
+                 ps.on('error', (err) => {
+                     console.error("PowerShell version check error:", err);
+                     resolve(null);
+                 });
+             });
+        }
+        return null;
+    } catch (e) {
+        console.error("Error getting game version:", e);
+        return null;
+    }
+});
+
 ipcMain.handle('read-realmlist', async (event, { gamePath }) => {
     try {
         if (!gamePath) return { success: false, message: "Missing game path" };

@@ -96,6 +96,15 @@
   box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
+.playButtonLarge.disabledError {
+  background: #374151;
+  box-shadow: none;
+  opacity: 0.8;
+  cursor: not-allowed;
+  color: #9ca3af;
+  border: 1px solid #4b5563;
+}
+
 .iconBtnLarge {
   height: 60px;
   width: 60px;
@@ -390,6 +399,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.errorText {
+  color: #ef4444 !important;
+  font-weight: 600;
 }
 
 .pathText {

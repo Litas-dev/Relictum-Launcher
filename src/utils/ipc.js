@@ -8,6 +8,7 @@ let ipcRenderer = {
     if (channel === 'check-for-updates') return { updateAvailable: true, latestVersion: '1.0.1', url: '#' };
     if (channel === 'verify-integrity') return { status: 'secure', message: 'Protected by Developer (Preview)', localHash: 'BROWSER-PREVIEW-HASH' };
     if (channel === 'update-realmlist') return { success: true };
+    if (channel === 'get-game-version') return '3.3.5.12340';
     if (channel === 'read-realmlist') return { success: true, content: 'set realmlist logon.warmane.com' };
     return null;
   },

@@ -1,7 +1,7 @@
 {
   "name": "warmane-launcher",
   "private": true,
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Unofficial Azeroth Legacy Launcher",
   "repository": {
     "type": "git",
