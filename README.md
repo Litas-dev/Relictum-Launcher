@@ -120,3 +120,7 @@ This project is an unofficial fan creation and is not affiliated with, endorsed,
 
 
 License: Source-available. Personal & Internal Use Only. Redistribution, SaaS use, and derivative distribution are prohibited. See LICENSE for details.
+
+
+## All game names and trademarks are the property of their respective owners.
+This project is not affiliated with or endorsed by any game publisher.
