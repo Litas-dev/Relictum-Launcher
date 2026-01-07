@@ -27,7 +27,7 @@ const AddonsView = ({
 
     const sortOptions = [
         { value: 'popular', label: t('addons.sort_popular') || 'Most Popular' },
-        { value: 'recent', label: t('addons.sort_recent') || 'Recently Added' }
+        { value: 'newest', label: t('addons.sort_recent') || 'Recently Added' }
     ];
 
     const currentSortLabel = sortOptions.find(o => o.value === addonSort)?.label || sortOptions[0].label;
