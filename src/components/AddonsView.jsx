@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { Plus, Puzzle, Search, Trash2, X, Info, Download, Check, Loader2 } from 'lucide-react';
+import { Plus, Puzzle, Search, Trash2, X, Info, Download, Check, Loader2, ChevronDown } from 'lucide-react';
 import styles from './AddonsView.module.css';
 
 const AddonsView = ({
@@ -23,6 +23,14 @@ const AddonsView = ({
 }) => {
     const { t } = useTranslation();
     const [selectedAddon, setSelectedAddon] = useState(null);
+    const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+
+    const sortOptions = [
+        { value: 'popular', label: t('addons.sort_popular') || 'Most Popular' },
+        { value: 'recent', label: t('addons.sort_recent') || 'Recently Added' }
+    ];
+
+    const currentSortLabel = sortOptions.find(o => o.value === addonSort)?.label || sortOptions[0].label;
 
     if (!activeGame) return <div className={styles.addonsView}>Error: Game data not found.</div>;
 
@@ -158,17 +166,35 @@ const AddonsView = ({
                                 onChange={(e) => setAddonSearch(e.target.value)}
                             />
                         </div>
-                        <select 
-                            className={styles.sortSelect}
-                            value={addonSort}
-                            onChange={(e) => setAddonSort(e.target.value)}
-                        >
-                            <option value="popular">{t('addons.sort.popularity')}</option>
-                            <option value="newest">{t('addons.sort.recently_added')}</option>
-                            <option value="updated">{t('addons.sort.recently_updated')}</option>
-                            <option value="a-z">{t('addons.sort.az')}</option>
-                            <option value="z-a">{t('addons.sort.za')}</option>
-                        </select>
+                        
+                        <div className={styles.sortDropdownContainer}>
+                            <div 
+                                className={styles.sortDropdownTrigger}
+                                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                            >
+                                <div className={styles.sortDropdownLabel}>
+                                    {currentSortLabel}
+                                </div>
+                                <ChevronDown size={16} style={{transform: isSortDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s'}} />
+                            </div>
+                            
+                            {isSortDropdownOpen && (
+                                <div className={styles.sortDropdownMenu}>
+                                    {sortOptions.map((option) => (
+                                        <div 
+                                            key={option.value}
+                                            className={`${styles.sortOption} ${addonSort === option.value ? styles.selected : ''}`}
+                                            onClick={() => {
+                                                setAddonSort(option.value);
+                                                setIsSortDropdownOpen(false);
+                                            }}
+                                        >
+                                            {option.label}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div className={styles.addonsListContainer}>
                         {loadingAddons ? (

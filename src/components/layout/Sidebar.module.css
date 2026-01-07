@@ -321,6 +321,11 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
 }
 
 .navItem:hover .renameBtn {
