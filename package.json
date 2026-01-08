@@ -42,7 +42,7 @@
     "productName": "Relictum Launcher",
     "copyright": "Copyright © 2026 Relictum",
     "directories": {
-      "output": "dist_v3.3.11-beta"
+      "output": "dist_v3.3.2"
     },
     "files": [
       "electron/**/*",
