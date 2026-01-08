@@ -193,9 +193,9 @@
   padding: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(0, 0, 0, 0.2);
-  display: flex;
+  display: grid;
   align-items: center;
-  justify-content: space-between;
+  grid-template-columns: auto 1fr auto;
 }
 
 .versionInfo {
@@ -270,8 +270,7 @@
 .footerIconsMiddle {
   display: flex;
   gap: 8px;
-  margin-right: auto;
-  margin-left: 20px;
+  justify-self: center;
 }
 
 .discordBtn,

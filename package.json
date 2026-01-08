@@ -11,6 +11,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5174 && electron .\"",
+    "prebuild": "node scripts/generate-icon.js",
     "build": "vite build && electron-builder",
     "preview": "vite preview"
   },
