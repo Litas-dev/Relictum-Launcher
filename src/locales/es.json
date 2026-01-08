@@ -15,6 +15,9 @@
     "join_discord": "Unirse a Discord"
   },
   "dashboard": {
+    "welcome_back": "Welcome back",
+    "click_to_edit": "Click to edit name",
+    "random_name": "Randomize Name",
     "hero_description": "Un launcher moderno y seguro hecho para jugar. <1/> Gestiona varias expansiones, addons y ajustes en un solo sitio.",
     "join_community": "UNIRSE A LA COMUNIDAD"
   },

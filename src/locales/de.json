@@ -15,6 +15,9 @@
     "join_discord": "Discord beitreten"
   },
   "dashboard": {
+    "welcome_back": "Welcome back",
+    "click_to_edit": "Click to edit name",
+    "random_name": "Randomize Name",
     "hero_description": "Ein moderner und sicherer Launcher fürs Gaming. <1/> Verwalte mehrere Erweiterungen, Addons und Einstellungen an einem Ort.",
     "join_community": "DER COMMUNITY BEITRETEN"
   },

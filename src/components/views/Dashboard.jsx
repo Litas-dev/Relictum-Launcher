@@ -3,9 +3,8 @@ import { useTranslation, Trans } from 'react-i18next';
 import styles from './Dashboard.module.css';
 import { games } from '../../config/games';
 import ipcRenderer from '../../utils/ipc';
-import { Users } from 'lucide-react';
+import { Users, Dices } from 'lucide-react';
 import titleImage from '../../assets/logo-new-white.png';
-import discordIcon from '../../assets/discord.png';
 
 const Dashboard = ({ games, onGameSelect, settings, user }) => {
   const { t } = useTranslation();
@@ -28,6 +27,13 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
     setIsEditingName(false);
   };
 
+  const handleRandomize = () => {
+    if (user && user.generateRandomName) {
+      const newName = user.generateRandomName();
+      setTempName(newName);
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSaveName();
     if (e.key === 'Escape') setIsEditingName(false);
@@ -42,10 +48,6 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
     return game ? game.clientIcon : null;
   };
 
-  const handleJoinCommunity = () => {
-    ipcRenderer.send('open-external', 'https://discord.gg/ttnHHMnru2');
-  };
-
   const classicIcon = getGameIcon('classic');
   const tbcIcon = getGameIcon('tbc');
   const wotlkIcon = getGameIcon('wotlk');
@@ -53,21 +55,32 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
   return (
     <div className={styles.dashboardView}>
       <div className={styles.heroSection}>
+        <img src={titleImage} alt="Relictum Logo" className={styles.titleImage} />
+        
         {/* Welcome Message */}
         {user && user.userProfile && (
           <div className={styles.welcomeContainer}>
             <span className={styles.welcomeText}>{t('dashboard.welcome_back', 'Welcome back')}, </span>
             <div className={styles.userTag}>
               {isEditingName ? (
-                <input 
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  onBlur={handleSaveName}
-                  onKeyDown={handleKeyDown}
-                  autoFocus
-                  className={styles.nameInput}
-                  maxLength={16}
-                />
+                <div className={styles.editContainer}>
+                  <input 
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={handleSaveName}
+                    onKeyDown={handleKeyDown}
+                    autoFocus
+                    className={styles.nameInput}
+                    maxLength={20}
+                  />
+                  <button 
+                    className={styles.randomButton}
+                    onMouseDown={(e) => { e.preventDefault(); handleRandomize(); }}
+                    title={t('dashboard.random_name', 'Randomize Name')}
+                  >
+                    <Dices size={20} />
+                  </button>
+                </div>
               ) : (
                 <span 
                   className={styles.username} 
@@ -77,33 +90,16 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
                   {user.userProfile.username}
                 </span>
               )}
-              <span className={styles.discriminator}>#{user.userProfile.discriminator}</span>
             </div>
           </div>
         )}
 
-        <img src={titleImage} alt="Relictum Logo" className={styles.titleImage} />
         <p className={styles.heroDescription}>
           <Trans i18nKey="dashboard.hero_description">
-            A modern, secure launcher built for gaming. <br/>
-            Manage multiple expansions, addons, and settings in one unified hub.
+            Cross the threshold. Here, you hold the keys to realms of legend. <br/>
+            Manage your worlds, tailor your journey, and carve your name into a history that is yours to write.
           </Trans>
         </p>
-
-        <div 
-          className={`${styles.discordIconContainer} ${glowClass}`} 
-          onClick={handleJoinCommunity}
-          title={t('dashboard.join_community')}
-        >
-          <div className={styles.iconGlow} style={{ width: '100px', height: '100px' }}>
-            <img 
-              src={discordIcon} 
-              alt="Join Discord" 
-              className={styles.gameIcon} 
-              style={{ width: '80px', height: '80px', objectFit: 'contain' }}
-            />
-          </div>
-        </div>
 
         <div className={styles.supportedGamesPreview}>
           <div 

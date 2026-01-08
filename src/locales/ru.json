@@ -15,6 +15,9 @@
     "join_discord": "Присоединиться к Discord"
   },
   "dashboard": {
+    "welcome_back": "Welcome back",
+    "click_to_edit": "Click to edit name",
+    "random_name": "Randomize Name",
     "hero_description": "Современный и безопасный лаунчер для игр. <1/> Управляй разными версиями игры, аддонами и настройками в одном месте.",
     "join_community": "ПРИСОЕДИНИТЬСЯ К СООБЩЕСТВУ"
   },

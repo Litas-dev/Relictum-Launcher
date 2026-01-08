@@ -17,7 +17,8 @@
   "dashboard": {
     "welcome_back": "Welcome back",
     "click_to_edit": "Click to edit name",
-    "hero_description": "A modern, secure launcher built for gaming. <1/> Manage multiple expansions, addons, and settings in one unified hub.",
+    "random_name": "Randomize Name",
+    "hero_description": "Cross the threshold. Here, you hold the keys to realms of legend. <1/> Manage your worlds, tailor your journey, and carve your name into a history that is yours to write.",
     "join_community": "JOIN COMMUNITY"
   },
   "settings": {
@@ -176,5 +177,29 @@
     "complete_modal_body": "Download Complete! You can now play.",
     "unavailable_title": "Download Unavailable",
     "unavailable_body": "Client downloads are no longer supported."
+  },
+  "social": {
+    "title": "Social",
+    "favorites": "Favorites",
+    "friends": "Friends",
+    "online": "Online",
+    "offline": "Offline",
+    "add_friend": "Add Friend",
+    "filter_friends": "Filter Friends",
+    "pending_requests": "pending friend requests",
+    "status_online": "Online",
+    "status_away": "Away",
+    "status_busy": "Busy",
+    "status_offline": "Offline",
+    "add_friend_title": "Add a Friend",
+    "add_friend_desc": "Enter the Username of the friend you want to add.",
+    "add_friend_placeholder": "Username#1234",
+    "send_request": "Send Request",
+    "request_sent": "Friend request sent!",
+    "add_favorite": "Add to Favorites",
+    "remove_favorite": "Remove from Favorites"
+  },
+  "chat": {
+    "placeholder": "Send a message..."
   }
 }

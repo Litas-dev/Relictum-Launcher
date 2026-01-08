@@ -6,9 +6,9 @@
   height: 32px;
   background: transparent;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 0 0 10px;
+  padding: 0;
   -webkit-app-region: drag;
   border-bottom: none;
   z-index: 200;
@@ -21,12 +21,46 @@
   font-size: 12px;
   color: var(--text-secondary);
   font-weight: 600;
+  padding-left: 10px;
+}
+
+.rightControls {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.socialBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  width: 40px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+.socialBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.socialBtn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-gold);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .windowControls {
   display: flex;
-  -webkit-app-region: no-drag;
-  gap: 0;
+  height: 100%;
 }
 
 .controlBtn {
@@ -53,5 +87,3 @@
   color: white;
   box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
 }
-
-

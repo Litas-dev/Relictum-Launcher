@@ -10,4 +10,4 @@ release
 *.log
 *.exe
 *.zip
-
+build-cache/

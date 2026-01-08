@@ -16,6 +16,7 @@ import GameDetails from './components/views/GameDetails';
 import Settings from './components/views/Settings';
 import About from './components/views/About';
 import UpdateNotification from './components/UpdateNotification';
+// SocialPanel removed from here as it is now a separate window
 
 // Config & Utils
 import { games } from './config/games';
@@ -427,7 +428,7 @@ function App() {
           )}
         </div>
       </div>
-
+      
       {/* Modals */}
       <Modal 
         isOpen={modalConfig.isOpen} 

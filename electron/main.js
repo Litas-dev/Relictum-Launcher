@@ -14,6 +14,8 @@ const net = require('net');
 
 // Allow autoplay without user interaction
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+app.commandLine.appendSwitch('disable-gpu-program-cache');
 
 let mainWindow = null;
 let downloadInterval = null;
@@ -53,20 +55,111 @@ function createWindow() {
   win.on('unmaximize', () => {
       win.setResizable(false);
   });
+}
 
-  ipcMain.on('minimize-window', () => win.minimize());
-  ipcMain.on('maximize-window', () => {
-    if (win.isMaximized()) {
-        win.unmaximize();
-    } else {
-        win.setResizable(true); // Allow maximizing
-        win.maximize();
-    }
+function createSocialWindow() {
+  if (socialWindow) {
+    socialWindow.focus();
+    return;
+  }
+
+  const win = new BrowserWindow({
+    width: 350,
+    height: 600,
+    resizable: false,
+    frame: false,
+    thickFrame: false,
+    backgroundColor: '#1a1a1a',
+    // parent: mainWindow, // REMOVED to allow independent z-ordering
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
-  ipcMain.on('close-window', () => {
-    win.close();
+
+  socialWindow = win;
+  
+  const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../dist_renderer/index.html')}`;
+  const socialUrl = `${startUrl}${startUrl.includes('?') ? '&' : '?'}window=social`;
+  
+  if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
+      // In development, we need to load the URL with the hash or query param correctly
+      // The React router logic I added supports BOTH.
+      // But let's stick to the hash for consistency if that's what we are moving to.
+      // However, Vite dev server might prefer query params for initial load.
+      // Let's try loading the hash URL in dev too.
+      win.loadURL('http://localhost:5174/#/social');
+      // win.webContents.openDevTools({ mode: 'detach' });
+  } else {
+      // FIX: Use hash routing for reliable multi-window loading in production
+      // instead of query params which can be stripping by some file protocols
+      const baseUrl = startUrl.split('?')[0]; 
+      win.loadURL(`${baseUrl}#/social`);
+  }
+  
+  win.on('closed', () => {
+    socialWindow = null;
   });
 }
+
+function createChatWindow(friend) {
+  if (chatWindow) {
+    chatWindow.focus();
+    chatWindow.webContents.send('update-chat-friend', friend);
+    return;
+  }
+
+  const win = new BrowserWindow({
+    width: 400,
+    height: 500,
+    resizable: true,
+    frame: false,
+    thickFrame: true, // Allow resizing
+    backgroundColor: '#1a1a1a',
+    // parent: socialWindow || mainWindow, // REMOVED to allow independent z-ordering
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  chatWindow = win;
+  
+  const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../dist_renderer/index.html')}`;
+  const friendParams = `&friendId=${encodeURIComponent(friend.id)}&friendName=${encodeURIComponent(friend.name)}&friendStatus=${encodeURIComponent(friend.status)}`;
+  const chatUrl = `${startUrl}${startUrl.includes('?') ? '&' : '?'}window=chat${friendParams}`;
+  
+  if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
+      win.loadURL(`http://localhost:5174?window=chat${friendParams}`);
+  } else {
+      win.loadURL(chatUrl);
+  }
+  
+  win.on('closed', () => {
+    chatWindow = null;
+  });
+}
+
+// --- Global Window Controls ---
+
+ipcMain.on('minimize-window', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
+});
+
+ipcMain.on('maximize-window', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow.setResizable(true); // Allow maximizing
+            mainWindow.maximize();
+        }
+    }
+});
+
+ipcMain.on('close-window', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+});
 
 app.whenReady().then(() => {
   createWindow();
