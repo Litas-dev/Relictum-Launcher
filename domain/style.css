@@ -675,6 +675,11 @@ footer {
         padding: 0 1rem;
     }
     
+    .hero-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
     .mobile-menu-btn {
         display: block;
         z-index: 1001;

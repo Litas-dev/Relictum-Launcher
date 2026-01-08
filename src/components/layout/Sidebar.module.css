@@ -274,7 +274,8 @@
 }
 
 .discordBtn,
-.websiteLink {
+.websiteLink,
+.donationBtn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-secondary);
@@ -299,6 +300,13 @@
   background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
   border-color: #3b82f6;
+}
+
+.donationBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+  transform: scale(1.1);
 }
 
 .gameName {

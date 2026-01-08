@@ -134,7 +134,8 @@
   "topbar": {
     "minimize": "Minimize",
     "maximize": "Maximize",
-    "close": "Close"
+    "close": "Close",
+    "support": "Support project"
   },
   "modals": {
     "game_not_found": "Game Not Found",

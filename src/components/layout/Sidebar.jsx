@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Layers, Plus, Puzzle, Settings, Info, AlertTriangle, Music, Download, Globe } from 'lucide-react';
+import { Home, Layers, Plus, Puzzle, Settings, Info, AlertTriangle, Music, Download, Globe, Heart } from 'lucide-react';
 import { games } from '../../config/games';
 import azerothLogo from '../../assets/logo-new-white.png';
 import styles from './Sidebar.module.css';
@@ -130,6 +130,17 @@ const Sidebar = ({
                         title={t('sidebar.join_discord')}
                     >
                         <DiscordIcon size={16} />
+                    </button>
+
+                    <button 
+                        className={styles.donationBtn} 
+                        onClick={() => {
+                            const { shell } = window.require('electron');
+                            shell.openExternal('https://paypal.me/KostelioKlausimynas');
+                        }}
+                        title={t('topbar.support')}
+                    >
+                        <Heart size={16} fill="#ef4444" color="#ef4444" />
                     </button>
 
                     <a 
