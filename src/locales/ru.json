@@ -2,8 +2,8 @@
   "sidebar": {
     "menu": "МЕНЮ",
     "dashboard": "Главная",
-    "clients": "Клиенты",
-    "manage_clients": "Управление клиентами",
+    "clients": "Игры",
+    "manage_clients": "Управление играми",
     "tools": "Инструменты",
     "addons": "Аддоны",
     "settings": "Настройки",
@@ -15,15 +15,19 @@
     "join_discord": "Присоединиться к Discord"
   },
   "dashboard": {
-    "welcome_back": "Welcome back",
-    "click_to_edit": "Click to edit name",
-    "random_name": "Randomize Name",
+    "welcome_back": "С возвращением",
+    "click_to_edit": "Нажмите, чтобы изменить имя",
+    "random_name": "Случайное имя",
     "hero_description": "Современный и безопасный лаунчер для игр. <1/> Управляй разными версиями игры, аддонами и настройками в одном месте.",
     "join_community": "ПРИСОЕДИНИТЬСЯ К СООБЩЕСТВУ"
   },
   "settings": {
     "title": "Настройки",
     "general": "Основные",
+    "appearance_tab": "Внешний вид",
+    "system": "Система",
+    "advanced": "Дополнительно",
+    "cache_management": "Управление кэшем",
     "language": "Язык",
     "language_desc": "Выбери язык приложения.",
     "english": "Английский",
@@ -41,6 +45,11 @@
     "clean_now": "Очистить сейчас",
     "app_theme": "Тема приложения",
     "app_theme_desc": "Выбери внешний вид лаунчера.",
+    "glow_effects": "Эффекты свечения",
+    "glow_effects_desc": "Включить или выключить анимацию свечения за иконками игр.",
+    "installation_paths": "Пути установки",
+    "default_download_path": "Путь для загрузок по умолчанию",
+    "default_download_path_desc": "Куда будут скачиваться новые игры.",
     "notifications_sound": "Уведомления и звук",
     "notifications": "Уведомления Windows",
     "notifications_desc": "Показывать уведомление, когда загрузка завершена.",
@@ -57,10 +66,10 @@
     "integrity_compromised": "Целостность нарушена",
     "local_hash": "Локальный hash:",
     "verify_github": "Проверить официальный hash на GitHub",
-    "manage_clients": "Управление клиентами",
-    "manage_clients_desc": "Показывать или скрывать версии игры в боковой панели.",
-    "rename_clients": "Переименовать клиенты",
-    "rename_clients_desc": "Задай своё имя для каждой версии игры.",
+    "manage_clients": "Управление играми",
+    "manage_clients_desc": "Показывать или скрывать игры в боковой панели.",
+    "rename_clients": "Переименовать игры",
+    "rename_clients_desc": "Задай своё имя для каждой игры.",
     "realmlist_editor": "Редактор realmlist",
     "realmlist_editor_desc": "Редактируй и сохраняй адреса серверов с историей.",
     "addons_manager": "Менеджер аддонов",
@@ -76,14 +85,29 @@
     "update_awareness": "Проверка обновлений",
     "update_awareness_desc": "Сообщает, если вышла новая версия лаунчера."
   },
+  "plugins": {
+    "title": "Плагины",
+    "tabs": {
+        "installed": "Установленные",
+        "browse": "Обзор"
+    },
+    "no_plugins_installed": "Плагины не установлены.",
+    "no_plugins_available": "Нет доступных плагинов.",
+    "install": "Установить",
+    "uninstall": "Удалить",
+    "confirm_uninstall": "Вы уверены, что хотите удалить {{name}}?",
+    "installing": "Установка...",
+    "author": "Автор: {{author}}",
+    "version": "Версия {{version}}"
+  },
   "addons": {
     "title": "Менеджер аддонов",
     "tabs": {
       "installed": "Установленные",
       "browse": "Обзор"
     },
-    "client_not_found": "Клиент не найден",
-    "client_not_found_desc": "Установи или укажи путь к клиенту <1>{{game}}</1>, чтобы управлять аддонами.",
+    "client_not_found": "Игра не найдена",
+    "client_not_found_desc": "Установи или укажи путь к игре <1>{{game}}</1>, чтобы управлять аддонами.",
     "install_zip": "Установить из ZIP",
     "count_addons": "{{count}} аддонов",
     "loading": "Загружаем аддоны...",
@@ -91,6 +115,10 @@
     "details": "Подробно",
     "uninstall": "Удалить",
     "search_placeholder": "Поиск аддонов...",
+    "sort_popular": "Популярные",
+    "sort_recent": "Недавно добавленные",
+    "sort_az": "Имя (А-Я)",
+    "sort_za": "Имя (Я-А)",
     "sort": {
       "popularity": "Популярность",
       "recently_added": "Недавно добавленные",
@@ -124,11 +152,12 @@
   "topbar": {
     "minimize": "Свернуть",
     "maximize": "Развернуть",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "support": "Поддержать проект"
   },
   "modals": {
     "game_not_found": "Игра не найдена",
-    "locate_first": "Сначала укажи путь к клиенту игры.",
+    "locate_first": "Сначала укажи путь к игре.",
     "ok": "OK",
     "error": "Ошибка",
     "success": "Готово",
@@ -136,19 +165,19 @@
     "save": "Сохранить изменения",
     "done": "Готово",
     "realmlist_title": "Редактировать realmlist",
-    "realmlist_desc": "Файл realmlist указывает игре, к какому серверу подключаться. Для Warmane нужно: <1>set realmlist logon.warmane.com</1>",
+    "realmlist_desc": "Файл realmlist указывает игре, к какому серверу подключаться. Пример: <1>set realmlist logon.example.com</1>",
     "realmlist_error_read": "Не удалось прочитать realmlist.",
     "realmlist_success_update": "Realmlist обновлён.",
     "realmlist_error_update": "Не удалось обновить realmlist.",
     "quick_select": "Быстрый выбор / История:",
     "cache_cleared": "Кэш очищен.",
     "cache_error": "Ошибка при очистке кэша",
-    "manage_clients_title": "Управление клиентами",
+    "manage_clients_title": "Управление играми",
     "manage_clients_desc": "Выбери, какие версии игры показывать в боковой панели.",
-    "rename_client_title": "Переименовать клиент",
+    "rename_client_title": "Переименовать игру",
     "reset_default": "Сбросить по умолчанию",
     "save_name": "Сохранить имя",
-    "rename_desc": "Введи своё имя для этого клиента:",
+    "rename_desc": "Введи своё имя для этой игры:",
     "enter_name": "Введите имя..."
   },
   "updater": {
@@ -163,5 +192,29 @@
     "complete_modal_body": "Загрузка завершена! Можно играть.",
     "unavailable_title": "Загрузка недоступна",
     "unavailable_body": "Загрузка клиентов больше не поддерживается."
+  },
+  "social": {
+    "title": "Социальное",
+    "favorites": "Избранное",
+    "friends": "Друзья",
+    "online": "В сети",
+    "offline": "Не в сети",
+    "add_friend": "Добавить друга",
+    "filter_friends": "Фильтр друзей",
+    "pending_requests": "ожидающие запросы",
+    "status_online": "В сети",
+    "status_away": "Отошел",
+    "status_busy": "Занят",
+    "status_offline": "Не в сети",
+    "add_friend_title": "Добавить друга",
+    "add_friend_desc": "Введите имя пользователя друга.",
+    "add_friend_placeholder": "Username#1234",
+    "send_request": "Отправить запрос",
+    "request_sent": "Запрос отправлен!",
+    "add_favorite": "Добавить в избранное",
+    "remove_favorite": "Убрать из избранного"
+  },
+  "chat": {
+    "placeholder": "Отправить сообщение..."
   }
 }

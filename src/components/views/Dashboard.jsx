@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import styles from './Dashboard.module.css';
 import { games } from '../../config/games';
 import ipcRenderer from '../../utils/ipc';
+import PluginStore from '../../utils/PluginStore';
 import { Users, Dices } from 'lucide-react';
 import titleImage from '../../assets/logo-new-white.png';
 
@@ -39,11 +40,29 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
     if (e.key === 'Escape') setIsEditingName(false);
   };
 
+  // Plugin Image Overrides
+  const [gameOverrides, setGameOverrides] = useState({});
+
+  useEffect(() => {
+    const update = () => {
+        const overrides = {};
+        games.forEach(g => {
+            overrides[g.id] = PluginStore.getGameImages(g.id);
+        });
+        setGameOverrides(overrides);
+    };
+    update();
+    return PluginStore.subscribe(update);
+  }, [games]);
+
   const enableGlows = settings?.enableGlowEffects !== false; // Default to true if undefined
   const glowClass = enableGlows ? '' : styles.disableGlow;
 
   // Helper: Retrieve game icon from configuration
   const getGameIcon = (id) => {
+    if (gameOverrides[id] && gameOverrides[id].clientIcon) {
+        return gameOverrides[id].clientIcon;
+    }
     const game = games.find(g => g.id === id);
     return game ? game.clientIcon : null;
   };
@@ -108,11 +127,13 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
             style={{ cursor: 'pointer' }}
           >
             <div className={`${styles.iconGlow} ${styles.iconGlowClassic}`}>
-              <img 
-                src={classicIcon} 
-                alt="Classic" 
-                className={`${styles.gameIcon} ${styles.gameIconClassic}`} 
-              />
+              {classicIcon && (
+                <img 
+                  src={classicIcon} 
+                  alt="Classic" 
+                  className={`${styles.gameIcon} ${styles.gameIconClassic}`} 
+                />
+              )}
             </div>
             <span className={`${styles.versionLabel} ${styles.versionLabelClassic}`}>1.12</span>
           </div>
@@ -123,11 +144,13 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
             style={{ cursor: 'pointer' }}
           >
             <div className={`${styles.iconGlow} ${styles.iconGlowTbc}`}>
-              <img 
-                src={tbcIcon} 
-                alt="TBC" 
-                className={`${styles.gameIcon} ${styles.gameIconTbc}`} 
-              />
+              {tbcIcon && (
+                <img 
+                  src={tbcIcon} 
+                  alt="TBC" 
+                  className={`${styles.gameIcon} ${styles.gameIconTbc}`} 
+                />
+              )}
             </div>
             <span className={`${styles.versionLabel} ${styles.versionLabelTbc}`}>2.4.3</span>
           </div>
@@ -138,11 +161,13 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
             style={{ cursor: 'pointer' }}
           >
             <div className={`${styles.iconGlow} ${styles.iconGlowWotlk}`}>
-              <img 
-                src={wotlkIcon} 
-                alt="WotLK" 
-                className={`${styles.gameIcon} ${styles.gameIconWotlk}`} 
-              />
+              {wotlkIcon && (
+                <img 
+                  src={wotlkIcon} 
+                  alt="WotLK" 
+                  className={`${styles.gameIcon} ${styles.gameIconWotlk}`} 
+                />
+              )}
             </div>
             <span className={`${styles.versionLabel} ${styles.versionLabelWotlk}`}>3.3.5</span>
           </div>

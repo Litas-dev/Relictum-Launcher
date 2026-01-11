@@ -30,10 +30,18 @@ export const useGameLibrary = () => {
 
     // Load game paths
     useEffect(() => {
-        const savedPaths = localStorage.getItem('warmane_game_paths');
-        if (savedPaths) {
-            setGamePaths(JSON.parse(savedPaths));
-        }
+        const loadPaths = () => {
+            const savedPaths = localStorage.getItem('warmane_game_paths');
+            if (savedPaths) {
+                setGamePaths(JSON.parse(savedPaths));
+            }
+        };
+
+        loadPaths();
+        
+        // Listen for updates from plugins
+        window.addEventListener('warmane-game-paths-updated', loadPaths);
+        return () => window.removeEventListener('warmane-game-paths-updated', loadPaths);
     }, []);
 
     // Listen for game events

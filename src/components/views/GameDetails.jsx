@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Globe, FolderSearch } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Play, Globe, FolderSearch, Puzzle, Settings, Image as ImageIcon, User, Camera, Palette, Edit } from 'lucide-react';
 import styles from './GameDetails.module.css';
 import ipcRenderer from '../../utils/ipc';
+import PluginStore from '../../utils/PluginStore';
 
 const GameDetails = ({
   activeGame,
@@ -14,8 +16,24 @@ const GameDetails = ({
   onForgetGame,
   enableGlowEffects
 }) => {
+  const { t } = useTranslation();
   const [detectedVersion, setDetectedVersion] = useState(null);
   const [isVersionCompatible, setIsVersionCompatible] = useState(true);
+  const [pluginActions, setPluginActions] = useState([]);
+  const [pluginWidgets, setPluginWidgets] = useState([]);
+  const [gameImages, setGameImages] = useState({});
+  const [gameGlow, setGameGlow] = useState(null);
+
+  useEffect(() => {
+    const updateActions = () => {
+        setPluginActions([...PluginStore.getGameActions()]);
+        setPluginWidgets([...PluginStore.getGameDetailsWidgets()]);
+        setGameImages(PluginStore.getGameImages(activeGameId));
+        setGameGlow(PluginStore.getGameGlow(activeGameId));
+    };
+    updateActions();
+    return PluginStore.subscribe(updateActions);
+  }, [activeGameId]);
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -47,10 +65,11 @@ const GameDetails = ({
       const detectedMajor = getMajor(detectedVersion);
 
       // Check compatibility only if both versions were successfully parsed
-      if (gameMajor && detectedMajor) {
+      if (gameMajor && detectedMajor && !activeGame.isCustom) {
         setIsVersionCompatible(gameMajor === detectedMajor);
       } else {
         // Default to compatible if version parsing fails to prevent blocking valid clients
+        // Also always compatible for custom games (user responsibility)
         setIsVersionCompatible(true);
       }
     } else {
@@ -59,62 +78,131 @@ const GameDetails = ({
   }, [detectedVersion, activeGame, currentPath]);
 
   return (
-    <div className={styles.gameView} data-game={activeGame.id}>
-      <div className={styles.gameHeader}>
+    <div id="game-details-view" className={styles.gameView} data-game={activeGame.id}>
+      <div id="game-header" className={styles.gameHeader}>
         <div className={styles.gameArtWrapper}>
           <div className={styles.artContainer}>
-            <img 
-              src={activeGame.cardArt || activeGame.icon}  
-              className={styles.gameHeaderArt} 
-              alt={activeGame.name}
-              style={enableGlowEffects ? {
-                filter: `drop-shadow(0 0 30px ${
-                  activeGame.id === 'tbc' ? 'rgba(40, 255, 60, 0.6)' : 
-                  activeGame.id === 'classic' ? 'rgba(251, 191, 36, 0.6)' :
-                  'rgba(0, 140, 255, 0.6)'
-                })`
-              } : {}}
-            />
-            <div 
-              className={`${styles.overlayIcon} ${styles[`glow_${activeGame.id}`]}`}
-              style={enableGlowEffects ? {} : { filter: 'none', boxShadow: 'none' }}
-            >
+            {(gameImages.cardArt !== undefined ? gameImages.cardArt : (activeGame.cardArt || activeGame.icon)) && (
               <img 
-                src={activeGame.clientIcon} 
-                alt={`${activeGame.shortName} Icon`}
-                className={styles.largeGameIcon}
-                style={enableGlowEffects ? {} : { filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
+                id="game-hero-art"
+                src={gameImages.cardArt !== undefined ? gameImages.cardArt : (activeGame.cardArt || activeGame.icon)}  
+                className={`${styles.gameHeaderArt} ${enableGlowEffects && !gameGlow ? (styles[`banner_glow_${activeGame.id}`] || styles.banner_glow_wotlk) : ''}`}
+                alt={activeGame.name}
+                style={enableGlowEffects && gameGlow ? {
+                  filter: `drop-shadow(0 0 30px ${gameGlow})`
+                } : {}}
               />
+            )}
+            <div 
+              className={`${styles.overlayIcon} ${!gameGlow ? styles[`glow_${activeGame.id}`] : ''}`}
+              style={enableGlowEffects ? (gameGlow ? { filter: `drop-shadow(0 0 15px ${gameGlow})` } : {}) : { filter: 'none', boxShadow: 'none' }}
+            >
+              {(gameImages.clientIcon !== undefined ? gameImages.clientIcon : activeGame.clientIcon) && (
+                <img 
+                  id="game-logo-icon"
+                  src={gameImages.clientIcon !== undefined ? gameImages.clientIcon : activeGame.clientIcon} 
+                  alt={`${activeGame.shortName} Icon`}
+                  className={styles.largeGameIcon}
+                  style={enableGlowEffects ? {} : { filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
+                />
+              )}
             </div>
           </div>
         </div>
 
-        <div className={styles.gameInfoActions}>
-          <div className={styles.playSection}>
+        <div id="game-info-actions" className={styles.gameInfoActions}>
+          <div id="play-section" className={styles.playSection}>
             {currentPath ? (
-              <div className={styles.playButtonGroup}>
+              <div id="play-button-group" className={styles.playButtonGroup}>
                 <button 
+                  id="play-button"
                   className={`${styles.playButtonLarge} ${isPlaying ? styles.playing : ''} ${!isVersionCompatible ? styles.disabledError : ''}`}
                   onClick={onPlay}
                   disabled={isPlaying || !isVersionCompatible}
                 >
                   <Play size={24} fill="currentColor" /> 
-                  {!isVersionCompatible ? "WRONG VERSION" : (isPlaying ? "PLAYING" : "PLAY")}
+                  {!isVersionCompatible ? t('game_details.wrong_version') : (isPlaying ? t('game_details.playing') : t('game_details.play'))}
                 </button>
-                <button 
-                  className={styles.iconBtnLarge} 
-                  onClick={onConfigureRealmlist}
-                  title="Configure Realmlist"
+                
+                <button
+                    className={styles.iconBtnLarge}
+                    onClick={() => onConfigureRealmlist(activeGameId)}
+                    title={t('game_details.configure_realmlist')}
                 >
-                  <Globe size={24} />
+                    <Settings size={24} />
                 </button>
+
+                {pluginActions.map(action => {
+                    if (action.condition && !action.condition(activeGame)) return null;
+                    const IconComponent = (action.icon && {
+                        'puzzle': Puzzle,
+                        'image': ImageIcon,
+                        'user': User,
+                        'camera': Camera,
+                        'palette': Palette,
+                        'edit': Edit,
+                        'settings': Settings
+                    }[action.icon.toLowerCase()]) || Puzzle;
+                    
+                    return (
+                        <button
+                            key={action.id}
+                            className={styles.iconBtnLarge}
+                            onClick={() => {
+                                if (typeof action.callback === 'function') {
+                                    action.callback(activeGame);
+                                } else if (typeof action.callback === 'string') {
+                                    console.warn("Plugin action callback is not a function", action);
+                                }
+                            }}
+                            title={action.label}
+                            style={{ gap: '10px' }}
+                        >
+                            <IconComponent size={22} />
+                            <span style={{ fontSize: '16px', fontWeight: '600' }}>{action.label}</span>
+                        </button>
+                    );
+                })}
               </div>
             ) : (
-              <div className={styles.installSection}>
+              <div id="install-section" className={styles.installSection}>
                 <div className={styles.installButtons}>
-                  <button className={styles.locateButton} onClick={onLocateGame}>
-                    <FolderSearch size={16} /> Locate Existing Installation
+                  <button id="locate-button" className={styles.locateButton} onClick={onLocateGame}>
+                    <FolderSearch size={16} /> {t('game_details.locate_game')}
                   </button>
+                  {pluginActions.length > 0 && (
+                    <div style={{ display: 'flex', gap: '10px', marginLeft: '10px', flexWrap: 'wrap' }}>
+                        {pluginActions.map(action => {
+                            if (action.condition && !action.condition(activeGame)) return null;
+                            const IconComponent = (action.icon && {
+                                'puzzle': Puzzle,
+                                'image': ImageIcon,
+                                'user': User,
+                                'camera': Camera,
+                                'palette': Palette,
+                                'edit': Edit,
+                                'settings': Settings
+                            }[action.icon.toLowerCase()]) || Puzzle;
+
+                            return (
+                                <button
+                                    key={action.id}
+                                    className={styles.iconBtnLarge}
+                                    onClick={() => {
+                                        if (typeof action.callback === 'function') {
+                                            action.callback(activeGame);
+                                        }
+                                    }}
+                                    title={action.label}
+                                    style={{ gap: '10px' }}
+                                >
+                                    <IconComponent size={20} />
+                                    <span style={{ fontSize: '14px', fontWeight: '600' }}>{action.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -122,28 +210,42 @@ const GameDetails = ({
         </div>
       </div>
 
-      <div className={styles.gameDetailsGrid}>
+      <div id="game-details-grid" className={styles.gameDetailsGrid}>
         <div className={styles.detailCard}>
-          <h4>Game Version</h4>
+          <h4>{t('game_details.game_version')}</h4>
           <p>{activeGame.version}</p>
           {detectedVersion && (
             <p className={!isVersionCompatible ? styles.errorText : ''} style={isVersionCompatible ? { fontSize: '0.8em', color: '#888', marginTop: '4px' } : { fontSize: '0.9em', marginTop: '4px' }}>
-              Detected: {detectedVersion} {!isVersionCompatible && '(Incompatible)'}
+              {t('game_details.detected_version', { version: detectedVersion })} {!isVersionCompatible && t('game_details.incompatible')}
             </p>
           )}
         </div>
         <div className={styles.detailCard}>
-          <h4>Installation Path</h4>
-          <p className={styles.pathText} title={currentPath || 'Not Installed'}>
-            {currentPath || 'Not Installed'}
+          <h4>{t('game_details.installation_path')}</h4>
+          <p className={styles.pathText} title={currentPath || t('game_details.not_installed')}>
+            {currentPath || t('game_details.not_installed')}
           </p>
           {currentPath && (
-            <button className={styles.removePathBtn} onClick={onForgetGame}>Remove</button>
+            <button className={styles.removePathBtn} onClick={onForgetGame}>{t('game_details.remove')}</button>
           )}
         </div>
       </div>
 
-
+      {pluginWidgets.length > 0 && (
+          <div id="plugin-widgets-area" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {pluginWidgets.map(widget => (
+                  <div key={widget.id} id={widget.id} className="plugin-widget" style={{
+                      background: 'rgba(0,0,0,0.3)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      borderRadius: '8px',
+                      padding: '15px'
+                  }}>
+                      {widget.title && <h4 style={{ margin: '0 0 10px 0', color: '#f8b700' }}>{widget.title}</h4>}
+                      <div dangerouslySetInnerHTML={{ __html: widget.content }} />
+                  </div>
+              ))}
+          </div>
+      )}
     </div>
   );
 };

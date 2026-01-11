@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2, ChevronDown, FolderOpen, X, Globe } from 'lucide-react';
 import styles from './Settings.module.css';
 import { themes } from '../../config/themes';
+import PluginStore from '../../utils/PluginStore';
 
 /**
  * Settings Component
@@ -34,6 +35,21 @@ const Settings = ({
   const [activeTab, setActiveTab] = useState('general');
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [pluginWidgets, setPluginWidgets] = useState({ general: [], appearance: [], system: [] });
+
+  useEffect(() => {
+    const updateWidgets = () => {
+        setPluginWidgets({
+            general: [...PluginStore.getSettingsWidgets('general')],
+            appearance: [...PluginStore.getSettingsWidgets('appearance')],
+            system: [...PluginStore.getSettingsWidgets('system')]
+        });
+    };
+
+    const unsubscribe = PluginStore.subscribe(updateWidgets);
+    updateWidgets();
+    return unsubscribe;
+  }, []);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -121,65 +137,81 @@ const Settings = ({
                 </label>
               </div>
             </div>
+
+            {pluginWidgets.general.map(widget => (
+              <div key={widget.id} className={styles.settingsSection}>
+                 {widget.title && <h3>{widget.title}</h3>}
+                 <div dangerouslySetInnerHTML={{ __html: widget.content }} />
+              </div>
+            ))}
           </>
         );
       
       case 'appearance':
         return (
-          <div className={styles.settingsSection}>
-            <h3>{t('settings.appearance_tab')}</h3>
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleLabel}>
-                <span className={styles.toggleTitle}>{t('settings.app_theme')}</span>
-                <span className={styles.toggleDesc}>{t('settings.app_theme_desc')}</span>
-              </div>
-              <div className={styles.themeSelectorContainer}>
-                <div 
-                  className={styles.themeSelectorTrigger}
-                  onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-                >
-                  <div className={styles.themeSelectorLabel}>
-                    <span className={styles.themeColorPreview} style={{background: themes[currentTheme]?.colors['--primary-gold']}}></span>
-                    {themes[currentTheme]?.name}
-                  </div>
-                  <ChevronDown size={16} style={{transform: isThemeDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s'}} />
+          <>
+            <div className={styles.settingsSection}>
+              <h3>{t('settings.appearance_tab')}</h3>
+              <div className={styles.toggleRow}>
+                <div className={styles.toggleLabel}>
+                  <span className={styles.toggleTitle}>{t('settings.app_theme')}</span>
+                  <span className={styles.toggleDesc}>{t('settings.app_theme_desc')}</span>
                 </div>
-                
-                {isThemeDropdownOpen && (
-                  <div className={styles.themeSelectorDropdown}>
-                    {Object.values(themes).map(theme => (
-                      <div 
-                        key={theme.id} 
-                        className={`${styles.themeOption} ${currentTheme === theme.id ? styles.selected : ''}`}
-                        onClick={() => {
-                          setCurrentTheme(theme.id);
-                          setIsThemeDropdownOpen(false);
-                        }}
-                      >
-                        <span className={styles.themeColorPreview} style={{background: theme.colors['--primary-gold']}}></span>
-                        {theme.name}
-                      </div>
-                    ))}
+                <div className={styles.themeSelectorContainer}>
+                  <div 
+                    className={styles.themeSelectorTrigger}
+                    onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
+                  >
+                    <div className={styles.themeSelectorLabel}>
+                      <span className={styles.themeColorPreview} style={{background: themes[currentTheme]?.colors['--primary-gold']}}></span>
+                      {themes[currentTheme]?.name}
+                    </div>
+                    <ChevronDown size={16} style={{transform: isThemeDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s'}} />
                   </div>
-                )}
+                  
+                  {isThemeDropdownOpen && (
+                    <div className={styles.themeSelectorDropdown}>
+                      {Object.values(themes).map(theme => (
+                        <div 
+                          key={theme.id} 
+                          className={`${styles.themeOption} ${currentTheme === theme.id ? styles.selected : ''}`}
+                          onClick={() => {
+                            setCurrentTheme(theme.id);
+                            setIsThemeDropdownOpen(false);
+                          }}
+                        >
+                          <span className={styles.themeColorPreview} style={{background: theme.colors['--primary-gold']}}></span>
+                          {theme.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.toggleRow}>
+                <div className={styles.toggleLabel}>
+                  <span className={styles.toggleTitle}>{t('settings.glow_effects')}</span>
+                  <span className={styles.toggleDesc}>{t('settings.glow_effects_desc')}</span>
+                </div>
+                <label className={styles.toggleSwitch}>
+                  <input 
+                    type="checkbox" 
+                    checked={enableGlowEffects}
+                    onChange={toggleGlowEffects}
+                  />
+                  <span className={styles.slider}></span>
+                </label>
               </div>
             </div>
 
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleLabel}>
-                <span className={styles.toggleTitle}>{t('settings.glow_effects')}</span>
-                <span className={styles.toggleDesc}>{t('settings.glow_effects_desc')}</span>
+            {pluginWidgets.appearance.map(widget => (
+              <div key={widget.id} className={styles.settingsSection}>
+                 {widget.title && <h3>{widget.title}</h3>}
+                 <div dangerouslySetInnerHTML={{ __html: widget.content }} />
               </div>
-              <label className={styles.toggleSwitch}>
-                <input 
-                  type="checkbox" 
-                  checked={enableGlowEffects}
-                  onChange={toggleGlowEffects}
-                />
-                <span className={styles.slider}></span>
-              </label>
-            </div>
-          </div>
+            ))}
+          </>
         );
 
       case 'system':
@@ -249,6 +281,13 @@ const Settings = ({
                 </label>
               </div>
             </div>
+
+            {pluginWidgets.system.map(widget => (
+              <div key={widget.id} className={styles.settingsSection}>
+                 {widget.title && <h3>{widget.title}</h3>}
+                 <div dangerouslySetInnerHTML={{ __html: widget.content }} />
+              </div>
+            ))}
           </>
         );
 

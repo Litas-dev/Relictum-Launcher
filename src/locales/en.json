@@ -2,8 +2,8 @@
   "sidebar": {
     "menu": "MENU",
     "dashboard": "Dashboard",
-    "clients": "CLIENTS",
-    "manage_clients": "Manage Clients",
+    "clients": "GAMES",
+    "manage_clients": "Manage Games",
     "tools": "TOOLS",
     "addons": "Addons",
     "settings": "Settings",
@@ -49,7 +49,7 @@
     "glow_effects_desc": "Enable or disable the glow animation behind game icons.",
     "installation_paths": "Installation Paths",
     "default_download_path": "Default Download Location",
-    "default_download_path_desc": "Where new game clients will be downloaded.",
+    "default_download_path_desc": "Where new games will be downloaded.",
     "notifications_sound": "Notifications & Sound",
     "notifications": "Desktop Notifications",
     "notifications_desc": "Show a Windows notification when downloads complete.",
@@ -66,10 +66,10 @@
     "integrity_compromised": "Integrity Compromised",
     "local_hash": "Local Hash:",
     "verify_github": "Verify Official Hash on GitHub",
-    "manage_clients": "Manage Clients",
-    "manage_clients_desc": "Show or hide expansions in the sidebar.",
-    "rename_clients": "Rename Clients",
-    "rename_clients_desc": "Give each client a custom display name.",
+    "manage_clients": "Manage Games",
+    "manage_clients_desc": "Show or hide games in the sidebar.",
+    "rename_clients": "Rename Games",
+    "rename_clients_desc": "Give each game a custom display name.",
     "realmlist_editor": "Realmlist Editor",
     "realmlist_editor_desc": "Edit and save server addresses with quick history.",
     "addons_manager": "Addons Manager",
@@ -85,14 +85,29 @@
     "update_awareness": "Update Awareness",
     "update_awareness_desc": "Detect launcher updates and version status."
   },
+  "plugins": {
+    "title": "Plugins",
+    "tabs": {
+        "installed": "Installed",
+        "browse": "Browse"
+    },
+    "no_plugins_installed": "No plugins installed.",
+    "no_plugins_available": "No plugins available.",
+    "install": "Install",
+    "uninstall": "Uninstall",
+    "confirm_uninstall": "Are you sure you want to uninstall {{name}}?",
+    "installing": "Installing...",
+    "author": "By {{author}}",
+    "version": "Version {{version}}"
+  },
   "addons": {
     "title": "Addons Manager",
     "tabs": {
       "installed": "Installed",
       "browse": "Browse"
     },
-    "client_not_found": "Client Not Found",
-    "client_not_found_desc": "Please install or locate the <1>{{game}}</1> client to view and manage addons.",
+    "client_not_found": "Game Not Found",
+    "client_not_found_desc": "Please install or locate <1>{{game}}</1> to view and manage addons.",
     "install_zip": "Install from ZIP",
     "count_addons": "{{count}} Addons",
     "loading": "Loading addons...",
@@ -142,7 +157,7 @@
   },
   "modals": {
     "game_not_found": "Game Not Found",
-    "locate_first": "Please locate the game client first.",
+    "locate_first": "Please locate the game first.",
     "ok": "OK",
     "error": "Error",
     "success": "Success",
@@ -150,19 +165,19 @@
     "save": "Save Changes",
     "done": "Done",
     "realmlist_title": "Edit Realmlist",
-    "realmlist_desc": "The realmlist file tells the game which server to connect to. For Warmane, it should be: <1>set realmlist logon.warmane.com</1>",
+    "realmlist_desc": "The realmlist file tells the game which server to connect to. Example: <1>set realmlist logon.example.com</1>",
     "realmlist_error_read": "Could not read realmlist file.",
     "realmlist_success_update": "Realmlist updated successfully!",
     "realmlist_error_update": "Failed to update realmlist.",
     "quick_select": "Quick Select / History:",
     "cache_cleared": "Cache cleared successfully!",
     "cache_error": "Failed to clear cache",
-    "manage_clients_title": "Manage Clients",
-    "manage_clients_desc": "Select which expansions you want to see in the sidebar.",
-    "rename_client_title": "Rename Client",
+    "manage_clients_title": "Manage Games",
+    "manage_clients_desc": "Select which games you want to see in the sidebar.",
+    "rename_client_title": "Rename Game",
     "reset_default": "Reset to Default",
     "save_name": "Save Name",
-    "rename_desc": "Enter a custom name for this client in the sidebar:",
+    "rename_desc": "Enter a custom name for this game in the sidebar:",
     "enter_name": "Enter name..."
   },
   "updater": {
@@ -176,7 +191,7 @@
     "complete_body": "World of Warcraft is ready to play!",
     "complete_modal_body": "Download Complete! You can now play.",
     "unavailable_title": "Download Unavailable",
-    "unavailable_body": "Client downloads are no longer supported."
+    "unavailable_body": "Game downloads are no longer supported."
   },
   "social": {
     "title": "Social",

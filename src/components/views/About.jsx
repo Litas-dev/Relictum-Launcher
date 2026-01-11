@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, ExternalLink, Users, Edit, Globe, Puzzle, Trash2, Palette, Music, RefreshCw, CheckCircle } from 'lucide-react';
 import styles from './About.module.css';
+import PluginStore from '../../utils/PluginStore';
 
 const About = ({ appVersion, integrityStatus, integrityHash }) => {
   const { t } = useTranslation();
+  const [pluginWidgets, setPluginWidgets] = useState([]);
+
+  useEffect(() => {
+    const updateWidgets = () => {
+        setPluginWidgets([...PluginStore.getAboutWidgets()]);
+    };
+
+    const unsubscribe = PluginStore.subscribe(updateWidgets);
+    updateWidgets();
+    return unsubscribe;
+  }, []);
+
   const openLink = (url) => {
     window.open(url, '_blank');
   };
@@ -15,7 +28,7 @@ const About = ({ appVersion, integrityStatus, integrityHash }) => {
         <h2>{t('about.title')} <span className={styles.versionTag}>v{appVersion || '3.0.1'}</span></h2>
       </div>
 
-      <div className={`${styles.securityCard} ${styles[integrityStatus] || styles.secure}`}>
+      <div className={`${styles.securityCard} ${styles[integrityStatus] || styles.secure}`} id="system-integrity-check">
         <div className={styles.securityHeader}>
           <Shield size={40} className={styles.shieldIcon} />
           <div className={styles.securityInfo}>
@@ -44,79 +57,90 @@ const About = ({ appVersion, integrityStatus, integrityHash }) => {
         </button>
       </div>
 
-      <div className={styles.clientList}>
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Users size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+      <div className={styles.gameList}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Users size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.manage_clients')}</h4>
             <span>{t('about.manage_clients_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Edit size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Edit size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.rename_clients')}</h4>
             <span>{t('about.rename_clients_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Globe size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Globe size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.realmlist_editor')}</h4>
             <span>{t('about.realmlist_editor_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Puzzle size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Puzzle size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.addons_manager')}</h4>
             <span>{t('about.addons_manager_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Trash2 size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Trash2 size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.cache_cleanup')}</h4>
             <span>{t('about.cache_cleanup_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Palette size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Palette size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.theme_selector')}</h4>
             <span>{t('about.theme_selector_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><Music size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><Music size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.ambient_music')}</h4>
             <span>{t('about.ambient_music_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><CheckCircle size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><CheckCircle size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.integrity_check')}</h4>
             <span>{t('about.integrity_check_desc')}</span>
           </div>
         </div>
 
-        <div className={styles.clientItem}>
-          <div className={styles.clientIconWrapper}><RefreshCw size={24} color="#fbbf24" /></div>
-          <div className={styles.clientInfo}>
+        <div className={styles.gameItem}>
+          <div className={styles.gameIconWrapper}><RefreshCw size={24} color="#fbbf24" /></div>
+          <div className={styles.gameInfo}>
             <h4>{t('about.update_awareness')}</h4>
             <span>{t('about.update_awareness_desc')}</span>
           </div>
         </div>
       </div>
+
+      {pluginWidgets.length > 0 && (
+        <div className={styles.pluginWidgetsSection}>
+          {pluginWidgets.map(widget => (
+            <div key={widget.id} className={styles.pluginWidget}>
+              {widget.title && <h3>{widget.title}</h3>}
+              <div dangerouslySetInnerHTML={{ __html: widget.content }} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

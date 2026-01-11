@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Layers, Plus, Puzzle, Settings, Info, AlertTriangle, Music, Download, Globe, Heart } from 'lucide-react';
+import { Home, Layers, Plus, Puzzle, Settings, Info, AlertTriangle, Music, Download, Globe, Heart, Box } from 'lucide-react';
 import { games } from '../../config/games';
 import ipcRenderer from '../../utils/ipc';
+import PluginStore from '../../utils/PluginStore';
 import azerothLogo from '../../assets/logo-new-white.png';
 import styles from './Sidebar.module.css';
 
@@ -25,7 +26,7 @@ const Sidebar = ({
     activeGameId,
     setActiveGameId,
     visibleGameIds,
-    onManageClients,
+    onManageGames,
     onOpenAddons,
     integrityStatus,
     isMusicPlaying,
@@ -36,9 +37,24 @@ const Sidebar = ({
     onRenameGame
 }) => {
     const { t } = useTranslation();
+    const [pluginItems, setPluginItems] = useState([]);
+    const [customGames, setCustomGames] = useState([]);
+
+    useEffect(() => {
+        const updatePlugins = () => {
+            setPluginItems([...PluginStore.getMenuItems()]);
+            setCustomGames([...PluginStore.getCustomGames()]);
+        };
+        // Initial load
+        updatePlugins();
+        // Subscribe
+        return PluginStore.subscribe(updatePlugins);
+    }, []);
+
+    const allGames = [...games, ...customGames];
 
     return (
-        <div className={styles.sidebar}>
+        <div id="app-sidebar" className={styles.sidebar}>
             <div className={styles.sidebarLogo}>
                 <div className={styles.sidebarLogoGlow}>
                     <img src={azerothLogo} alt="WoW Launcher" />
@@ -51,11 +67,11 @@ const Sidebar = ({
                     className={`${styles.navItem} ${activeView === 'dashboard' ? styles.active : ''}`}
                     onClick={() => setActiveView('dashboard')}
                 >
-                    <Home size={18} /> {t('sidebar.dashboard')}
+                    <Home size={18} /> <span>{t('sidebar.dashboard')}</span>
                 </button>
                 
                 <div className={styles.navLabel}>{t('sidebar.clients')}</div>
-                {games.filter(g => visibleGameIds.includes(g.id)).map(game => (
+                {allGames.filter(g => visibleGameIds.includes(g.id) || g.isCustom).map(game => (
                     <div 
                         key={game.id}
                         className={`${styles.navItem} ${activeView === 'game' && activeGameId === game.id ? styles.active : ''}`}
@@ -66,7 +82,11 @@ const Sidebar = ({
                         role="button"
                         tabIndex={0}
                     >
-                        <Layers size={18} /> 
+                        {(game.isCustom && game.clientIcon) ? (
+                            <img src={game.clientIcon} style={{ width: '18px', height: '18px', objectFit: 'contain', borderRadius: '2px' }} alt="" />
+                        ) : (
+                            game.isCustom ? <div style={{ width: '18px', height: '18px' }} /> : <Layers size={18} />
+                        )}
                         <span className={styles.gameName}>
                             {customGameNames[game.id] || game.menuLabel || game.version || game.shortName}
                         </span>
@@ -85,29 +105,55 @@ const Sidebar = ({
                 
                 <button 
                     className={`${styles.navItem} ${styles.manageGamesBtn}`}
-                    onClick={onManageClients}
+                    onClick={onManageGames}
                 >
-                    <Plus size={14} /> {t('sidebar.manage_clients')}
+                    <Plus size={14} /> <span>{t('sidebar.manage_clients')}</span>
                 </button>
+
+                {pluginItems.length > 0 && (
+                    <>
+                        <div className={styles.navLabel}>Plugins</div>
+                        {pluginItems.map(item => {
+                            const viewId = item.onClickId.startsWith('plugin:') ? item.onClickId : `plugin:${item.onClickId}`;
+                            return (
+                                <button
+                                    key={item.id}
+                                    className={`${styles.navItem} ${activeView === viewId ? styles.active : ''}`}
+                                    onClick={() => setActiveView(viewId)}
+                                >
+                                    <Box size={18} /> <span>{item.label}</span>
+                                </button>
+                            );
+                        })}
+                    </>
+                )}
 
                 <div className={styles.navLabel}>{t('sidebar.tools')}</div>
                 <button 
                     className={`${styles.navItem} ${activeView === 'addons' ? styles.active : ''}`}
                     onClick={onOpenAddons}
                 >
-                    <Puzzle size={18} /> {t('sidebar.addons')}
+                    <Puzzle size={18} /> <span>{t('sidebar.addons')}</span>
                 </button>
+
+                <button 
+                    className={`${styles.navItem} ${activeView === 'plugins-manager' ? styles.active : ''}`}
+                    onClick={() => setActiveView('plugins-manager')}
+                >
+                    <Box size={18} /> <span>Plugins</span>
+                </button>
+
                 <button 
                     className={`${styles.navItem} ${activeView === 'settings' ? styles.active : ''}`}
                     onClick={() => setActiveView('settings')}
                 >
-                    <Settings size={18} /> {t('sidebar.settings')}
+                    <Settings size={18} /> <span>{t('sidebar.settings')}</span>
                 </button>
                 <button 
                     className={`${styles.navItem} ${activeView === 'about' ? styles.active : ''}`}
                     onClick={() => setActiveView('about')}
                 >
-                    <Info size={18} /> {t('sidebar.about')}
+                    <Info size={18} /> <span>{t('sidebar.about')}</span>
                     {integrityStatus === 'danger' && <AlertTriangle size={14} color="#ef4444" className={styles.dangerIcon} />}
                 </button>
             </div>

@@ -80,19 +80,19 @@ header.scrolled {
 
 .logo {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 0;
+    gap: 1rem;
     color: var(--primary);
 }
 
 .logo-img {
-    height: 8rem;
+    height: 4rem;
     width: auto;
     object-fit: contain;
     transition: height 0.3s ease;
     animation: logo-glow 3s infinite ease-in-out;
-    margin-bottom: -3rem;
+    margin-bottom: 0;
     position: relative;
     z-index: 1;
 }
@@ -100,7 +100,7 @@ header.scrolled {
 .logo-text {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     line-height: 1;
     position: relative;
     z-index: 2;
@@ -124,13 +124,13 @@ header.scrolled {
 }
 
 header.scrolled .logo-img {
-    height: 4rem;
-    margin-bottom: -1.5rem;
+    height: 3.5rem;
+    margin-bottom: 0;
 }
 
 .logo.small .logo-img {
-    height: 4rem;
-    margin-bottom: -1.5rem;
+    height: 3.5rem;
+    margin-bottom: 0;
 }
 
 nav {

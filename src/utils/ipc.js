@@ -9,7 +9,7 @@ let ipcRenderer = {
     if (channel === 'verify-integrity') return { status: 'secure', message: 'Protected by Developer (Preview)', localHash: 'BROWSER-PREVIEW-HASH' };
     if (channel === 'update-realmlist') return { success: true };
     if (channel === 'get-game-version') return '3.3.5.12340';
-    if (channel === 'read-realmlist') return { success: true, content: 'set realmlist logon.warmane.com' };
+    if (channel === 'read-realmlist') return { success: true, content: 'set realmlist logon.example.com' };
     return null;
   },
   removeAllListeners: () => {},

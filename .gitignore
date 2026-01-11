@@ -11,3 +11,8 @@ release
 *.exe
 *.zip
 build-cache/
+
+# Proprietary Plugin Engine
+src/utils/PluginLoader.js
+src/utils/PluginStore.js
+plugins/

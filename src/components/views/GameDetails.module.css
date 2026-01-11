@@ -58,12 +58,13 @@
   width: 180px;
   height: 180px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); /* Stronger shadow for readability */
 }
 
 .gameInfoActions {
   width: 100%;
-  margin-top: 0;
+  margin-top: 40px; /* Moved down to avoid overlapping with art */
+  z-index: 101; /* Above art */
   align-items: center;
   border-top: none;
   padding-top: 10px;
@@ -136,7 +137,8 @@
 
 .iconBtnLarge {
   height: 60px;
-  width: 60px;
+  min-width: 60px;
+  padding: 0 20px;
   border-radius: 4px;
   background: rgba(var(--primary-rgb), 0.1);
   border: 1px solid rgba(var(--primary-rgb), 0.3);
@@ -469,4 +471,17 @@
 
 .glow_wotlk .largeGameIcon {
   filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.6));
+}
+
+/* Banner Glow Styles */
+.banner_glow_classic {
+  filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.6));
+}
+
+.banner_glow_tbc {
+  filter: drop-shadow(0 0 30px rgba(34, 197, 94, 0.6));
+}
+
+.banner_glow_wotlk {
+  filter: drop-shadow(0 0 30px rgba(0, 140, 255, 0.6));
 }

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, net: electronNet } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -26,6 +26,10 @@ let downloadedInstallerPath = null;
 // --- Configuration ---
 const SECURITY_CHECK_ENABLED = true;
 const SECURITY_ENDPOINT = 'https://raw.githubusercontent.com/Litas-dev/Relictum-Launcher/refs/heads/main/security.json';
+
+// --- AutoUpdater Configuration ---
+autoUpdater.autoDownload = false;
+autoUpdater.verifyUpdateCodeSignature = false; // Allow delta updates for unsigned builds
 
 // --- Application Logic ---
 function createWindow() {
@@ -245,6 +249,119 @@ async function processGameDownload(downloadedFile, finalPath, eventSender, optio
     }
 }
 
+ipcMain.handle('open-external', async (event, url) => {
+    try {
+        // Security: Ensure it's a web URL
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            await shell.openExternal(url);
+            return { success: true };
+        }
+        return { success: false, error: 'Only HTTP/HTTPS URLs are allowed.' };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('install-remote-plugin', async (event, { url, id }) => {
+    try {
+        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
+        if (!fs.existsSync(pluginsDir)) {
+            fs.mkdirSync(pluginsDir, { recursive: true });
+        }
+        
+        // Sanitize plugin ID (folder name)
+        const safeId = path.basename(id);
+        if (safeId !== id || !id) {
+             throw new Error("Invalid plugin ID");
+        }
+        
+        const pluginDir = path.join(pluginsDir, safeId);
+        if (!fs.existsSync(pluginDir)) {
+            fs.mkdirSync(pluginDir, { recursive: true });
+        }
+        
+        // 1. Download Manifest
+        // The URL provided is expected to be the MANIFEST URL
+        const manifestUrl = url;
+        const manifestPath = path.join(pluginDir, 'manifest.json');
+        
+        console.log(`[Plugin Install] Downloading manifest from ${manifestUrl}`);
+        
+        await new Promise((resolve, reject) => {
+             const request = electronNet.request(manifestUrl);
+             request.on('response', (response) => {
+                 if (response.statusCode !== 200) {
+                     reject(new Error(`Failed to download manifest: ${response.statusCode}`));
+                     return;
+                 }
+                 const file = fs.createWriteStream(manifestPath);
+                 response.pipe(file);
+                 file.on('finish', () => file.close(() => resolve()));
+                 file.on('error', (err) => reject(err));
+             });
+             request.on('error', (err) => reject(err));
+             request.end();
+        });
+
+        // 2. Parse Manifest to get Main Script
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        const mainScript = manifest.main;
+        if (!mainScript) throw new Error("Manifest missing 'main' script definition");
+
+        // 3. Download Main Script
+        // Assume script is in same folder as manifest
+        const scriptUrl = manifestUrl.substring(0, manifestUrl.lastIndexOf('/')) + '/' + mainScript;
+        const scriptPath = path.join(pluginDir, mainScript);
+        
+        // Ensure script directory exists
+        const scriptDir = path.dirname(scriptPath);
+        if (!fs.existsSync(scriptDir)) {
+            fs.mkdirSync(scriptDir, { recursive: true });
+        }
+
+        console.log(`[Plugin Install] Downloading script from ${scriptUrl}`);
+
+        await new Promise((resolve, reject) => {
+             const request = electronNet.request(scriptUrl);
+             request.on('response', (response) => {
+                 if (response.statusCode !== 200) {
+                     reject(new Error(`Failed to download script: ${response.statusCode}`));
+                     return;
+                 }
+                 const file = fs.createWriteStream(scriptPath);
+                 response.pipe(file);
+                 file.on('finish', () => file.close(() => resolve()));
+                 file.on('error', (err) => reject(err));
+             });
+             request.on('error', (err) => reject(err));
+             request.end();
+        });
+
+        return { success: true };
+    } catch (e) {
+        console.error("Install plugin error:", e);
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('uninstall-plugin', async (event, filename) => {
+    try {
+        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
+        const safeFilename = path.basename(filename);
+        const targetPath = path.join(pluginsDir, safeFilename);
+        
+        if (fs.existsSync(targetPath)) {
+            // Updated to support directory deletion for folder-based plugins
+            fs.rmSync(targetPath, { recursive: true, force: true });
+            return { success: true };
+        } else {
+            return { success: false, error: "Plugin not found" };
+        }
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
 ipcMain.on('launch-game', (event, gamePath) => {
   if (!gamePath || !fs.existsSync(gamePath)) {
       event.reply('game-launch-error', 'Game executable not found!');
@@ -327,12 +444,7 @@ ipcMain.handle('select-game-path', async () => {
     return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
 });
 
-ipcMain.handle('select-folder', async () => {
-    const result = await dialog.showOpenDialog({
-        properties: ['openDirectory']
-    });
-    return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
-});
+
 
 ipcMain.handle('select-directory', async () => {
     const result = await dialog.showOpenDialog({
@@ -530,6 +642,177 @@ ipcMain.on('install-update', () => {
 
 ipcMain.on('open-url', (event, url) => {
     shell.openExternal(url);
+});
+
+// --- Plugin System ---
+let hasSyncedDevPlugins = false;
+
+ipcMain.handle('load-plugins', async () => {
+    try {
+        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
+        
+        if (!fs.existsSync(pluginsDir)) {
+            fs.mkdirSync(pluginsDir, { recursive: true });
+        }
+
+        // Dev-mode sync: Sync local folders to userData (Always sync in dev to allow hot-reloading)
+        if (!app.isPackaged) {
+            // hasSyncedDevPlugins = true; 
+            const localPluginsDir = path.join(__dirname, '../plugins');
+            if (fs.existsSync(localPluginsDir)) {
+                const entries = fs.readdirSync(localPluginsDir, { withFileTypes: true });
+                for (const entry of entries) {
+                    if (entry.isDirectory()) {
+                        const srcDir = path.join(localPluginsDir, entry.name);
+                        const destDir = path.join(pluginsDir, entry.name);
+                        
+                        // Simple sync: if not exists or dev forced, copy recursively
+                        if (!fs.existsSync(destDir)) {
+                             // Using simple cp recursive
+                             fs.cpSync(srcDir, destDir, { recursive: true });
+                             console.log(`[Plugin System] Synced dev plugin folder: ${entry.name}`);
+                        } else {
+                            // Update content if exists (basic copy over)
+                            fs.cpSync(srcDir, destDir, { recursive: true, force: true });
+                        }
+                    }
+                }
+            }
+        }
+
+        const entries = fs.readdirSync(pluginsDir, { withFileTypes: true });
+        const plugins = [];
+        
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const pluginDir = path.join(pluginsDir, entry.name);
+                const manifestPath = path.join(pluginDir, 'manifest.json');
+                
+                if (fs.existsSync(manifestPath)) {
+                    try {
+                        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                        const mainFile = manifest.main || 'index.js';
+                        const mainPath = path.join(pluginDir, mainFile);
+                        
+                        if (fs.existsSync(mainPath)) {
+                            const content = fs.readFileSync(mainPath, 'utf8');
+                            
+                            plugins.push({
+                                name: entry.name, // Use folder name as ID/Name key
+                                path: mainPath,
+                                content: content,
+                                metadata: manifest // Use manifest directly
+                            });
+                        }
+                    } catch (e) {
+                        console.error(`Error loading plugin ${entry.name}:`, e);
+                    }
+                }
+            }
+        }
+        return plugins;
+    } catch (e) {
+        console.error("Error loading plugins:", e);
+        return [];
+    }
+});
+
+// --- Plugin Download & File Operations ---
+
+// Plugin System Info
+    ipcMain.handle('plugin-get-system-info', async () => {
+        const os = require('os');
+        return {
+            platform: os.platform(),
+            arch: os.arch(),
+            release: os.release(),
+            cpus: os.cpus(),
+            totalmem: os.totalmem(),
+            freemem: os.freemem(),
+            hostname: os.hostname(),
+            userInfo: os.userInfo().username
+        };
+    });
+
+    // Plugin Open Path
+    ipcMain.on('plugin-open-path', (event, path) => {
+        shell.openPath(path);
+    });
+
+    ipcMain.on('plugin-download-file', (event, { url, savePath, id }) => {
+    try {
+        const file = fs.createWriteStream(savePath);
+        
+        file.on('error', (err) => {
+            console.error("[Plugin] File Write Error:", err);
+            event.reply('plugin-download-error', { id, error: err.message });
+        });
+
+        const request = electronNet.request(url);
+        
+        request.on('response', (response) => {
+            if (response.statusCode !== 200) {
+                file.end();
+                fs.unlink(savePath, () => {});
+                event.reply('plugin-download-error', { id, error: 'Status Code: ' + response.statusCode });
+                return;
+            }
+
+            const totalBytes = parseInt(response.headers['content-length'], 10);
+            let downloadedBytes = 0;
+
+            response.on('data', (chunk) => {
+                downloadedBytes += chunk.length;
+                file.write(chunk);
+                
+                const progress = totalBytes ? (downloadedBytes / totalBytes) * 100 : 0;
+                // Send progress every ~1% or so to avoid flooding IPC? 
+                // For now, send every chunk but maybe throttle in renderer.
+                event.reply('plugin-download-progress', { id, progress, downloadedBytes, totalBytes });
+            });
+
+            response.on('end', () => {
+                file.end();
+                event.reply('plugin-download-complete', { id, path: savePath });
+            });
+            
+            response.on('error', (err) => {
+                file.end();
+                fs.unlink(savePath, () => {});
+                event.reply('plugin-download-error', { id, error: err.message });
+            });
+        });
+
+        request.on('error', (err) => {
+            fs.unlink(savePath, () => {});
+            event.reply('plugin-download-error', { id, error: err.message });
+        });
+
+        request.end();
+    } catch (e) {
+        event.reply('plugin-download-error', { id, error: e.message });
+    }
+});
+
+ipcMain.handle('plugin-extract-file', async (event, { filePath, destPath }) => {
+    try {
+        console.log(`[Plugin] Extracting ${filePath} to ${destPath}`);
+        if (!fs.existsSync(filePath)) throw new Error("File not found");
+        
+        // Ensure destination exists
+        if (!fs.existsSync(destPath)) {
+            fs.mkdirSync(destPath, { recursive: true });
+        }
+
+        // Use AdmZip for now as it is available
+        const zip = new AdmZip(filePath);
+        zip.extractAllTo(destPath, true);
+        
+        return { success: true };
+    } catch (e) {
+        console.error("[Plugin] Extraction failed:", e);
+        return { success: false, error: e.message };
+    }
 });
 
 // --- News & Status ---
@@ -828,6 +1111,23 @@ ipcMain.handle('select-zip-file', async () => {
     const result = await dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [{ name: 'Zip Files', extensions: ['zip'] }]
+    });
+    return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
+});
+
+ipcMain.handle('select-folder', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+    return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
+});
+
+ipcMain.handle('select-image', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+            { name: 'Images', extensions: ['jpg', 'png', 'gif', 'webp', 'jpeg'] }
+        ]
     });
     return (result.canceled || result.filePaths.length === 0) ? null : result.filePaths[0];
 });

@@ -2,8 +2,8 @@
   "sidebar": {
     "menu": "MENU",
     "dashboard": "Painel",
-    "clients": "Clientes",
-    "manage_clients": "Gerenciar clientes",
+    "clients": "Jogos",
+    "manage_clients": "Gerenciar jogos",
     "tools": "Ferramentas",
     "addons": "Addons",
     "settings": "Configurações",
@@ -15,15 +15,19 @@
     "join_discord": "Entrar no Discord"
   },
   "dashboard": {
-    "welcome_back": "Welcome back",
-    "click_to_edit": "Click to edit name",
-    "random_name": "Randomize Name",
+    "welcome_back": "Bem-vindo de volta",
+    "click_to_edit": "Clique para editar nome",
+    "random_name": "Nome Aleatório",
     "hero_description": "Um launcher moderno e seguro feito para jogar. <1/> Gerencie várias expansões, addons e configurações em um só lugar.",
     "join_community": "ENTRAR NA COMUNIDADE"
   },
   "settings": {
     "title": "Configurações",
     "general": "Geral",
+    "appearance_tab": "Aparência",
+    "system": "Sistema",
+    "advanced": "Avançado",
+    "cache_management": "Gestão de cache",
     "language": "Idioma",
     "language_desc": "Escolha o idioma do aplicativo.",
     "english": "Inglês",
@@ -41,6 +45,11 @@
     "clean_now": "Limpar agora",
     "app_theme": "Tema do app",
     "app_theme_desc": "Escolha o visual do launcher.",
+    "glow_effects": "Efeitos de brilho",
+    "glow_effects_desc": "Ative ou desative a animação de brilho atrás dos ícones do jogo.",
+    "installation_paths": "Pastas de instalação",
+    "default_download_path": "Local de download padrão",
+    "default_download_path_desc": "Onde novos jogos serão baixados.",
     "notifications_sound": "Notificações e som",
     "notifications": "Notificações na área de trabalho",
     "notifications_desc": "Mostra uma notificação quando o download terminar.",
@@ -57,10 +66,10 @@
     "integrity_compromised": "Integridade comprometida",
     "local_hash": "Hash local:",
     "verify_github": "Confirmar hash oficial no GitHub",
-    "manage_clients": "Gerenciar clientes",
-    "manage_clients_desc": "Mostre ou oculte expansões na barra lateral.",
-    "rename_clients": "Renomear clientes",
-    "rename_clients_desc": "Dê um nome personalizado para cada cliente.",
+    "manage_clients": "Gerenciar jogos",
+    "manage_clients_desc": "Mostre ou oculte jogos na barra lateral.",
+    "rename_clients": "Renomear jogos",
+    "rename_clients_desc": "Dê um nome personalizado para cada jogo.",
     "realmlist_editor": "Editor de realmlist",
     "realmlist_editor_desc": "Edite e salve os endereços dos servidores com histórico rápido.",
     "addons_manager": "Gerenciador de addons",
@@ -76,14 +85,29 @@
     "update_awareness": "Verificação de updates",
     "update_awareness_desc": "Detecta quando existe uma nova versão do launcher."
   },
+  "plugins": {
+    "title": "Plugins",
+    "tabs": {
+        "installed": "Instalados",
+        "browse": "Explorar"
+    },
+    "no_plugins_installed": "Nenhum plugin instalado.",
+    "no_plugins_available": "Nenhum plugin disponível.",
+    "install": "Instalar",
+    "uninstall": "Desinstalar",
+    "confirm_uninstall": "Tem certeza que deseja desinstalar {{name}}?",
+    "installing": "Instalando...",
+    "author": "Por {{author}}",
+    "version": "Versão {{version}}"
+  },
   "addons": {
     "title": "Gerenciador de Addons",
     "tabs": {
       "installed": "Instalados",
       "browse": "Explorar"
     },
-    "client_not_found": "Cliente não encontrado",
-    "client_not_found_desc": "Instale ou localize o cliente de <1>{{game}}</1> para ver e gerenciar addons.",
+    "client_not_found": "Jogo não encontrado",
+    "client_not_found_desc": "Instale ou localize o jogo <1>{{game}}</1> para ver e gerenciar addons.",
     "install_zip": "Instalar a partir de ZIP",
     "count_addons": "{{count}} addons",
     "loading": "Carregando addons...",
@@ -91,6 +115,10 @@
     "details": "Detalhes",
     "uninstall": "Desinstalar",
     "search_placeholder": "Buscar addons...",
+    "sort_popular": "Mais Populares",
+    "sort_recent": "Adicionados Recentemente",
+    "sort_az": "Nome (A-Z)",
+    "sort_za": "Nome (Z-A)",
     "sort": {
       "popularity": "Popularidade",
       "recently_added": "Adicionados recentemente",
@@ -124,7 +152,8 @@
   "topbar": {
     "minimize": "Minimizar",
     "maximize": "Maximizar",
-    "close": "Fechar"
+    "close": "Fechar",
+    "support": "Apoiar projeto"
   },
   "modals": {
     "game_not_found": "Jogo não encontrado",
@@ -136,19 +165,19 @@
     "save": "Salvar alterações",
     "done": "Concluído",
     "realmlist_title": "Editar realmlist",
-    "realmlist_desc": "O arquivo realmlist diz ao jogo para qual servidor ele deve conectar. No Warmane deve ser: <1>set realmlist logon.warmane.com</1>",
+    "realmlist_desc": "O arquivo realmlist diz ao jogo para qual servidor ele deve conectar. Exemplo: <1>set realmlist logon.example.com</1>",
     "realmlist_error_read": "Não foi possível ler o arquivo realmlist.",
     "realmlist_success_update": "Realmlist atualizado com sucesso!",
     "realmlist_error_update": "Falha ao atualizar o realmlist.",
     "quick_select": "Seleção rápida / Histórico:",
     "cache_cleared": "Cache limpo com sucesso!",
     "cache_error": "Erro ao limpar o cache",
-    "manage_clients_title": "Gerenciar clientes",
+    "manage_clients_title": "Gerenciar jogos",
     "manage_clients_desc": "Escolha quais expansões aparecem na barra lateral.",
-    "rename_client_title": "Renomear cliente",
+    "rename_client_title": "Renomear jogo",
     "reset_default": "Restaurar padrão",
     "save_name": "Salvar nome",
-    "rename_desc": "Digite um nome personalizado para este cliente:",
+    "rename_desc": "Digite um nome personalizado para este jogo:",
     "enter_name": "Digite um nome..."
   },
   "updater": {
@@ -162,6 +191,30 @@
     "complete_body": "World of Warcraft já está pronto para jogar!",
     "complete_modal_body": "Download finalizado! Agora você pode jogar.",
     "unavailable_title": "Download indisponível",
-    "unavailable_body": "Os downloads de clientes não são mais suportados."
+    "unavailable_body": "Os downloads de jogos não são mais suportados."
+  },
+  "social": {
+    "title": "Social",
+    "favorites": "Favoritos",
+    "friends": "Amigos",
+    "online": "Online",
+    "offline": "Offline",
+    "add_friend": "Adicionar Amigo",
+    "filter_friends": "Filtrar Amigos",
+    "pending_requests": "pedidos pendentes",
+    "status_online": "Online",
+    "status_away": "Ausente",
+    "status_busy": "Ocupado",
+    "status_offline": "Offline",
+    "add_friend_title": "Adicionar Amigo",
+    "add_friend_desc": "Digite o nome de usuário do amigo.",
+    "add_friend_placeholder": "Usuario#1234",
+    "send_request": "Enviar Pedido",
+    "request_sent": "Pedido de amizade enviado!",
+    "add_favorite": "Adicionar aos Favoritos",
+    "remove_favorite": "Remover dos Favoritos"
+  },
+  "chat": {
+    "placeholder": "Enviar mensagem..."
   }
 }

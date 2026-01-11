@@ -131,14 +131,14 @@
     border-color: var(--primary-gold);
 }
 
-/* Manage Clients Modal */
-.manage-clients-intro {
+/* Manage Games Modal */
+.manage-games-intro {
     color: var(--text-secondary);
     margin-bottom: 20px;
     font-size: 14px;
 }
 
-.manage-clients-list {
+.manage-games-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -146,7 +146,7 @@
     overflow-y: auto;
 }
 
-.client-row {
+.game-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -157,24 +157,24 @@
     transition: all 0.2s;
 }
 
-.client-row:hover {
+.game-row:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-.client-info {
+.game-info {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.client-icon {
+.game-icon {
     width: 24px;
     height: 24px;
     object-fit: contain;
 }
 
-.client-name {
+.game-name {
     color: var(--text-primary);
     font-weight: 600;
     font-size: 14px;

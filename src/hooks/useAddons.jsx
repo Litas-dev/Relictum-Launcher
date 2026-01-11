@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import ipcRenderer from '../utils/ipc';
 import localAddons from '../assets/addons.json';
 import { groupAddons, processAddonsForDisplay } from '../utils/addonUtils';
-import { games } from '../config/games';
 
 export const useAddons = ({ 
     activeView, 
+    activeGame,
     activeGameId, 
     gamePaths, 
     selectedDownloadIndex,
@@ -25,8 +25,6 @@ export const useAddons = ({
     const [addonPage, setAddonPage] = useState(1);
     const [filteredAddonCount, setFilteredAddonCount] = useState(localAddons.length);
     const itemsPerPage = 10;
-
-    const activeGame = games.find(g => g.id === activeGameId);
 
     useEffect(() => {
         if (activeView === 'addons' && activeAddonTab === 'installed') {
@@ -51,7 +49,7 @@ export const useAddons = ({
 
     // Effect: Fetch available addons from remote source
     useEffect(() => {
-        if (activeView === 'addons') {
+        if (activeView === 'addons' && activeGame) {
             const selectedVersion = activeGame.downloads && activeGame.downloads[selectedDownloadIndex] 
                 ? activeGame.downloads[selectedDownloadIndex].version 
                 : activeGame.version;
@@ -60,17 +58,31 @@ export const useAddons = ({
                 setLoadingAddons(true);
                 
                 // Filter local addons based on the active expansion
-                const expansionKey = activeGameId === 'wotlk' ? 'wotlk' : 
-                                     activeGameId === 'tbc' ? 'tbc' : 
-                                     activeGameId === 'vanilla' ? 'classic' : null;
+                let expansionKey = null;
+                let targetVersion = activeGame.version;
+
+                // Determine expansion from ID or Version
+                if (activeGameId === 'wotlk' || targetVersion === '3.3.5') {
+                    expansionKey = 'wotlk';
+                    targetVersion = '3.3.5';
+                } else if (activeGameId === 'tbc' || targetVersion === '2.4.3') {
+                    expansionKey = 'tbc';
+                    targetVersion = '2.4.3';
+                } else if (activeGameId === 'vanilla' || targetVersion === '1.12.1') {
+                    expansionKey = 'classic';
+                    targetVersion = '1.12.1';
+                } else if (targetVersion === '4.3.4') {
+                     expansionKey = 'cata';
+                } else if (targetVersion === '5.4.8') {
+                     expansionKey = 'mop';
+                }
 
                 const localForExpansion = localAddons
                     .filter(a => a.downloads && a.downloads[expansionKey])
                     .map(a => ({
                         ...a,
                         downloadUrl: a.downloads[expansionKey], // Override with expansion specific link
-                        gameVersion: activeGameId === 'wotlk' ? '3.3.5' : 
-                                     activeGameId === 'tbc' ? '2.4.3' : '1.12.1'
+                        gameVersion: targetVersion
                     }));
 
                 // Use local data as primary source now (since we have full database)
@@ -108,7 +120,7 @@ export const useAddons = ({
             
             fetchWarperia();
         }
-    }, [activeView, activeGameId, selectedDownloadIndex]);
+    }, [activeView, activeGameId, selectedDownloadIndex, activeGame]);
 
     // Effect: Filter and sort browse list
     useEffect(() => {
@@ -161,12 +173,28 @@ export const useAddons = ({
 
         setInstallingAddon(addon.title);
         
+        // Determine expansion for installation logic
+        let installExpansion = activeGameId;
+        const targetVersion = activeGame ? activeGame.version : null;
+
+        if (activeGameId === 'wotlk' || targetVersion === '3.3.5') {
+            installExpansion = 'wotlk';
+        } else if (activeGameId === 'tbc' || targetVersion === '2.4.3') {
+            installExpansion = 'tbc';
+        } else if (activeGameId === 'vanilla' || targetVersion === '1.12.1') {
+            installExpansion = 'classic';
+        } else if (targetVersion === '4.3.4') {
+             installExpansion = 'cata';
+        } else if (targetVersion === '5.4.8') {
+             installExpansion = 'mop';
+        }
+        
         try {
             const promise = ipcRenderer.invoke('install-warperia-addon', { 
                 gamePath: path, 
                 detailUrl: addon.detailUrl,
                 downloadUrl: addon.downloadUrl,
-                expansion: activeGameId
+                expansion: installExpansion
             });
             
             const timeout = new Promise((_, reject) => 

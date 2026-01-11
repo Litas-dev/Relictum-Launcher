@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { 
   Minus, Square, X, Play, Settings as SettingsIcon, Download, Users, Globe, 
   ChevronRight, XCircle, FolderSearch, RefreshCw, Puzzle, Trash2, Plus, 
@@ -15,6 +16,7 @@ import Dashboard from './components/views/Dashboard';
 import GameDetails from './components/views/GameDetails';
 import Settings from './components/views/Settings';
 import About from './components/views/About';
+import PluginsView from './components/views/PluginsView'; // Import
 import UpdateNotification from './components/UpdateNotification';
 // SocialPanel removed from here as it is now a separate window
 
@@ -23,6 +25,8 @@ import { games } from './config/games';
 import { themes } from './config/themes';
 import ipcRenderer from './utils/ipc';
 import { fetchWarperiaAddons } from './utils/addonUtils';
+import PluginLoader from './utils/PluginLoader';
+import PluginStore from './utils/PluginStore'; // Import Store
 
 // Hooks
 import { useGameLibrary } from './hooks/useGameLibrary';
@@ -35,6 +39,7 @@ import { useUser } from './hooks/useUser';
 import wotlkTheme from './assets/music/wotlk-theme.mp3';
 
 function App() {
+  const { t } = useTranslation();
   // UI State
   const [activeView, setActiveView] = useState('dashboard'); // dashboard, game, addons, settings
   const [modalConfig, setModalConfig] = useState({
@@ -45,11 +50,11 @@ function App() {
   });
   const [realmlistConfig, setRealmlistConfig] = useState({
     isOpen: false,
-    content: 'set realmlist logon.warmane.com',
+    content: 'set realmlist logon.example.com',
     gameId: null
   });
-  const [savedRealmlists, setSavedRealmlists] = useState(['set realmlist logon.warmane.com']);
-  const [isManageClientsOpen, setIsManageClientsOpen] = useState(false);
+  const [savedRealmlists, setSavedRealmlists] = useState(['set realmlist logon.example.com']);
+  const [isManageGamesOpen, setIsManageGamesOpen] = useState(false);
   const [customGameNames, setCustomGameNames] = useState({});
   const [renameConfig, setRenameConfig] = useState({
     isOpen: false,
@@ -68,7 +73,61 @@ function App() {
   // Music State
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const audioRef = useRef(null);
-  const WOTLK_THEME_URL = wotlkTheme;
+  const [musicUrl, setMusicUrl] = useState(wotlkTheme);
+  const [customGames, setCustomGames] = useState([]);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [hasSetDefaultView, setHasSetDefaultView] = useState(false);
+  const lastNavRequestRef = useRef(null);
+
+  // Initialize Hooks
+  const settings = useSettings();
+  const gameLibrary = useGameLibrary();
+  const user = useUser();
+
+  // Effect: Subscribe to Plugin Store (Music & Custom Games & Sidebar & Default View)
+  useEffect(() => {
+      const updateStore = () => {
+          const override = PluginStore.getMusic();
+          setMusicUrl(override || wotlkTheme);
+          setCustomGames(PluginStore.getCustomGames());
+          setIsSidebarVisible(PluginStore.getSidebarVisible());
+          
+          // Check for default view override (only once per session or when changed)
+          const defaultView = PluginStore.getDefaultView();
+          if (defaultView && !hasSetDefaultView) {
+              console.log("Applying Plugin Default View:", defaultView);
+              setActiveView(defaultView.view);
+              if (defaultView.gameId) {
+                  gameLibrary.setActiveGameId(defaultView.gameId);
+              }
+              setHasSetDefaultView(true);
+          }
+
+          // Check for Navigation Request
+          const navRequest = PluginStore.getNavigationRequest();
+          
+          // If store was reset (navRequest is null), clear our ref so we are ready for next one
+          if (!navRequest) {
+              lastNavRequestRef.current = null;
+          } else if (navRequest !== lastNavRequestRef.current) {
+               console.log("Processing Plugin Navigation:", navRequest);
+               setActiveView(navRequest.view);
+               if (navRequest.gameId) {
+                   gameLibrary.setActiveGameId(navRequest.gameId);
+               }
+               lastNavRequestRef.current = navRequest;
+          }
+      };
+      updateStore();
+      return PluginStore.subscribe(updateStore);
+  }, [hasSetDefaultView]); // Re-subscribe if hasSetDefaultView changes, but mainly relying on store notify
+
+  // Effect: When music URL changes, if it was playing, keep playing
+  useEffect(() => {
+      if (audioRef.current && isMusicPlaying) {
+          audioRef.current.play().catch(e => console.error("Playback failed", e));
+      }
+  }, [musicUrl]);
 
   // Modal Helpers
   const showModal = (title, body, footer = null) => {
@@ -79,10 +138,14 @@ function App() {
     setModalConfig(prev => ({ ...prev, isOpen: false }));
   };
 
-  // Initialize Hooks
-  const settings = useSettings();
-  const gameLibrary = useGameLibrary();
-  const user = useUser();
+  // Derived State (Moved up for hooks)
+  const allGames = [...games, ...customGames];
+  const activeGame = allGames.find(g => g.id === gameLibrary.activeGameId) || games[0];
+
+  // Effect: Notify plugins when active game changes
+  useEffect(() => {
+    PluginLoader.triggerGameChange(gameLibrary.activeGameId);
+  }, [gameLibrary.activeGameId]);
   
   const downloader = useDownloader({
     activeGameId: gameLibrary.activeGameId,
@@ -96,6 +159,7 @@ function App() {
 
   const addons = useAddons({
     activeView,
+    activeGame,
     activeGameId: gameLibrary.activeGameId,
     gamePaths: gameLibrary.gamePaths,
     selectedDownloadIndex: downloader.selectedDownloadIndex,
@@ -155,6 +219,17 @@ function App() {
     };
 
     fetchAppInfo();
+
+    // Initialize Plugin System
+    PluginLoader.init();
+
+    // Listen for Plugin Toasts
+    const handlePluginToast = (e) => {
+      console.log("Plugin Toast Received:", e.detail);
+    };
+
+    window.addEventListener('plugin-toast', handlePluginToast);
+    return () => window.removeEventListener('plugin-toast', handlePluginToast);
   }, []);
 
   // Realmlist Logic
@@ -205,7 +280,7 @@ function App() {
   const handleOpenRealmlist = async (gameId) => {
     const path = gameLibrary.gamePaths[gameId];
     if (!path) {
-      showModal('Game Not Found', 'Please locate the game client first.', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+      showModal(t('modals.game_not_found'), t('modals.locate_first'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
       return;
     }
     
@@ -218,10 +293,10 @@ function App() {
           gameId
         });
       } else {
-        showModal('Error', 'Could not read realmlist file.', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+        showModal(t('modals.error'), t('modals.realmlist_error_read'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
       }
     } catch (e) {
-      showModal('Error', 'Failed to read realmlist: ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+      showModal(t('modals.error'), t('modals.realmlist_error_read') + ': ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
     }
   };
 
@@ -239,12 +314,12 @@ function App() {
         }
         
         setRealmlistConfig(prev => ({ ...prev, isOpen: false }));
-        showModal('Success', 'Realmlist updated successfully!', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+        showModal(t('modals.success'), t('modals.realmlist_success_update'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
       } else {
-        showModal('Error', 'Failed to update realmlist.', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+        showModal(t('modals.error'), t('modals.realmlist_error_update'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
       }
     } catch (e) {
-      showModal('Error', 'Failed to update realmlist: ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+      showModal(t('modals.error'), t('modals.realmlist_error_update') + ': ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
     }
   };
 
@@ -256,7 +331,7 @@ function App() {
   };
 
   // Handlers: Manage client visibility and default download path
-  const toggleManageClients = () => setIsManageClientsOpen(!isManageClientsOpen);
+  const toggleManageGames = () => setIsManageGamesOpen(!isManageGamesOpen);
 
   const handleBrowseDefaultPath = async () => {
     try {
@@ -274,42 +349,78 @@ function App() {
     if (path) {
         try {
             await ipcRenderer.invoke('clear-game-cache', path);
-            showModal('Success', 'Cache cleared successfully!', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+            showModal(t('modals.success'), t('modals.cache_cleared'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
         } catch (e) {
-            showModal('Error', 'Failed to clear cache: ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+            showModal(t('modals.error'), t('modals.cache_error') + ': ' + e.message, <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
         }
     } else {
-        showModal('Error', 'Game path not found. Please locate the game first.', <button className="modal-btn-primary" onClick={closeModal}>OK</button>);
+        showModal(t('modals.error'), t('modals.locate_first'), <button className="modal-btn-primary" onClick={closeModal}>{t('modals.ok')}</button>);
     }
   };
 
-  // Derived State
-  const activeGame = games.find(g => g.id === gameLibrary.activeGameId);
+  // Plugin Page Content
+  const [pluginPageContent, setPluginPageContent] = useState(null);
+  
+  // Effect: Listen for plugin realmlist requests
+  useEffect(() => {
+      const handleRealmlistRequest = (e) => {
+          const { gameId } = e.detail;
+          handleOpenRealmlist(gameId);
+      };
+      window.addEventListener('open-realmlist-modal', handleRealmlistRequest);
+      return () => window.removeEventListener('open-realmlist-modal', handleRealmlistRequest);
+  }, [gameLibrary.gamePaths]);
+
+  // Effect: Listen for sidebar visibility changes from plugins
+  useEffect(() => {
+    const updateSidebarVisibility = () => {
+        setIsSidebarVisible(PluginStore.getSidebarVisible());
+    };
+    updateSidebarVisibility(); // Initial check
+    return PluginStore.subscribe(updateSidebarVisibility);
+  }, []);
+
+  useEffect(() => {
+    const updateContent = () => {
+        if (activeView.startsWith('plugin:')) {
+            const pageId = activeView.split(':')[1];
+            const content = PluginStore.getPage(pageId);
+            setPluginPageContent(content);
+        } else {
+            setPluginPageContent(null);
+        }
+    };
+
+    updateContent();
+    return PluginStore.subscribe(updateContent);
+  }, [activeView]);
 
   return (
     <div className="app-container">
-      <audio ref={audioRef} src={WOTLK_THEME_URL} loop />
+      <audio ref={audioRef} src={musicUrl} loop />
 
       {/* Main Layout */}
-      <Sidebar 
-        activeView={activeView}
-        setActiveView={setActiveView}
-        activeGameId={gameLibrary.activeGameId}
-        setActiveGameId={gameLibrary.setActiveGameId}
-        visibleGameIds={gameLibrary.visibleGameIds}
-        onManageClients={toggleManageClients}
-        onOpenAddons={() => setActiveView('addons')}
-        integrityStatus={integrityStatus}
-        isMusicPlaying={isMusicPlaying}
-        enableGlowEffects={settings.enableGlowEffects}
-        onToggleMusic={toggleMusic}
-        appVersion={appVersion}
-        updateInfo={updateInfo}
-        customGameNames={customGameNames}
-        onRenameGame={handleOpenRename}
-      />
+      {isSidebarVisible && (
+        <Sidebar 
+          activeView={activeView}
+          setActiveView={setActiveView}
+          activeGameId={gameLibrary.activeGameId}
+          setActiveGameId={gameLibrary.setActiveGameId}
+          visibleGameIds={gameLibrary.visibleGameIds}
+          onManageGames={toggleManageGames}
+          onOpenAddons={() => setActiveView('addons')}
+          integrityStatus={integrityStatus}
+          isMusicPlaying={isMusicPlaying}
+          enableGlowEffects={settings.enableGlowEffects}
+          onToggleMusic={toggleMusic}
+          appVersion={appVersion}
+          updateInfo={updateInfo}
+          customGameNames={customGameNames}
+          onRenameGame={handleOpenRename}
+        />
+      )}
 
-      <div className="main-content">
+      <div className="main-content" style={!isSidebarVisible ? { width: '100%', left: 0 } : {}}>
         <TopBar 
           activeGame={activeGame}
           serverPing={serverPing}
@@ -419,12 +530,37 @@ function App() {
             />
           )}
 
+          {activeView === 'plugins-manager' && (
+            <PluginsView />
+          )}
+
           {activeView === 'about' && (
             <About 
               appVersion={appVersion}
               integrityStatus={integrityStatus}
               integrityHash={integrityHash}
             />
+          )}
+
+          {/* Plugin View */}
+          {activeView.startsWith('plugin:') && (
+            <div style={{ padding: '2rem', color: '#fff', height: '100%', overflowY: 'auto' }}>
+                {pluginPageContent ? (
+                    <div>
+                        {/* DEBUG INFO */}
+                        {/* <div style={{background: 'red', padding: '5px', marginBottom: '10px'}}>
+                            DEBUG: Page Loaded. Length: {pluginPageContent.length}
+                        </div> */}
+                        <div dangerouslySetInnerHTML={{ __html: pluginPageContent }} />
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <h3>No content registered for this plugin page.</h3>
+                        <p style={{color: '#888'}}>Page ID: {activeView.split(':')[1]}</p>
+                        <p style={{color: '#888'}}>Please try reloading the plugins or the application.</p>
+                    </div>
+                )}
+            </div>
           )}
         </div>
       </div>
@@ -443,22 +579,21 @@ function App() {
       <Modal
         isOpen={realmlistConfig.isOpen}
         onClose={() => setRealmlistConfig(prev => ({ ...prev, isOpen: false }))}
-        title={`Edit Realmlist - ${activeGame.shortName}`}
+        title={`${t('modals.realmlist_title')} - ${activeGame.shortName}`}
         footer={
           <>
-            <button className="modal-btn-secondary" onClick={() => setRealmlistConfig(prev => ({ ...prev, isOpen: false }))}>Cancel</button>
-            <button className="modal-btn-primary" onClick={handleSaveRealmlist}>Save Changes</button>
+            <button className="modal-btn-secondary" onClick={() => setRealmlistConfig(prev => ({ ...prev, isOpen: false }))}>{t('modals.cancel')}</button>
+            <button className="modal-btn-primary" onClick={handleSaveRealmlist}>{t('modals.save')}</button>
           </>
         }
       >
         <div className="realmlist-editor">
             <p className="realmlist-desc">
-                The realmlist file tells the game which server to connect to. 
-                For Warmane, it should be: <span className="highlight">set realmlist logon.warmane.com</span>
+                <Trans i18nKey="modals.realmlist_desc" components={{ 1: <span className="highlight" /> }} />
             </p>
             
             <div className="quick-select">
-                <label>Quick Select / History:</label>
+                <label>{t('modals.quick_select')}</label>
                 <div className="history-chips">
                     {savedRealmlists.map((item, idx) => (
                         <div key={idx} className="chip" onClick={() => setRealmlistConfig(prev => ({ ...prev, content: item }))}>
@@ -480,21 +615,21 @@ function App() {
         </div>
       </Modal>
 
-      {/* Manage Clients Modal */}
+      {/* Manage Games Modal */}
       <Modal
-        isOpen={isManageClientsOpen}
-        onClose={() => setIsManageClientsOpen(false)}
-        title="Manage Clients"
+        isOpen={isManageGamesOpen}
+        onClose={() => setIsManageGamesOpen(false)}
+        title={t('sidebar.manage_clients')}
         footer={
-          <button className="modal-btn-primary" onClick={() => setIsManageClientsOpen(false)}>Done</button>
+          <button className="modal-btn-primary" onClick={() => setIsManageGamesOpen(false)}>{t('modals.done')}</button>
         }
       >
-        <div className="manage-clients-intro">Select which expansions you want to see in the sidebar.</div>
-        <div className="manage-clients-list">
-          {games.map(game => (
-            <div key={game.id} className="client-row">
-              <div className="client-info">
-                <span className="client-name">{customGameNames[game.id] || game.menuLabel || game.version || game.shortName}</span>
+        <div className="manage-games-intro">{t('about.manage_clients_desc')}</div>
+        <div className="manage-games-list">
+          {allGames.map(game => (
+            <div key={game.id} className="game-row">
+              <div className="game-info">
+                <span className="game-name">{customGameNames[game.id] || game.menuLabel || game.version || game.shortName}</span>
               </div>
               <label className={`visibility-toggle ${gameLibrary.visibleGameIds?.includes?.(game.id) ? 'active' : ''}`}> 
                 <input 
@@ -513,22 +648,22 @@ function App() {
       <Modal
         isOpen={renameConfig.isOpen}
         onClose={() => setRenameConfig(prev => ({ ...prev, isOpen: false }))}
-        title="Rename Client"
+        title={t('modals.rename_client_title')}
         footer={
           <>
-             <button className="modal-btn-secondary" onClick={handleResetName}>Reset to Default</button>
-             <button className="modal-btn-primary" onClick={handleSaveRename}>Save Name</button>
+             <button className="modal-btn-secondary" onClick={handleResetName}>{t('modals.reset_default')}</button>
+             <button className="modal-btn-primary" onClick={handleSaveRename}>{t('modals.save_name')}</button>
           </>
         }
       >
         <div className="rename-game-form">
-           <p className="rename-desc">Enter a custom name for this client in the sidebar:</p>
+           <p className="rename-desc">{t('modals.rename_desc')}</p>
            <input 
               type="text" 
               className="modal-input"
               value={renameConfig.currentName}
               onChange={(e) => setRenameConfig(prev => ({ ...prev, currentName: e.target.value }))}
-              placeholder="Enter name..."
+              placeholder={t('modals.enter_name')}
               autoFocus
            />
         </div>

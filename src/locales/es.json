@@ -2,8 +2,8 @@
   "sidebar": {
     "menu": "MENÚ",
     "dashboard": "Panel",
-    "clients": "Clientes",
-    "manage_clients": "Gestionar clientes",
+    "clients": "Juegos",
+    "manage_clients": "Gestionar juegos",
     "tools": "Herramientas",
     "addons": "Addons",
     "settings": "Ajustes",
@@ -15,9 +15,9 @@
     "join_discord": "Unirse a Discord"
   },
   "dashboard": {
-    "welcome_back": "Welcome back",
-    "click_to_edit": "Click to edit name",
-    "random_name": "Randomize Name",
+    "welcome_back": "Bienvenido de nuevo",
+    "click_to_edit": "Clic para editar nombre",
+    "random_name": "Nombre aleatorio",
     "hero_description": "Un launcher moderno y seguro hecho para jugar. <1/> Gestiona varias expansiones, addons y ajustes en un solo sitio.",
     "join_community": "UNIRSE A LA COMUNIDAD"
   },
@@ -49,7 +49,7 @@
     "glow_effects_desc": "Activa o desactiva la animación de brillo detrás de los iconos del juego.",
     "installation_paths": "Rutas de instalación",
     "default_download_path": "Ubicación de descarga predeterminada",
-    "default_download_path_desc": "Donde se descargarán los nuevos clientes de juego.",
+    "default_download_path_desc": "Donde se descargarán los nuevos juegos.",
     "notifications_sound": "Notificaciones y sonido",
     "notifications": "Notificaciones en escritorio",
     "notifications_desc": "Muestra una notificación cuando termine una descarga.",
@@ -66,10 +66,10 @@
     "integrity_compromised": "Integridad comprometida",
     "local_hash": "Hash local:",
     "verify_github": "Comprobar hash oficial en GitHub",
-    "manage_clients": "Gestionar clientes",
-    "manage_clients_desc": "Muestra u oculta expansiones en la barra lateral.",
-    "rename_clients": "Renombrar clientes",
-    "rename_clients_desc": "Ponle un nombre personalizado a cada cliente.",
+    "manage_clients": "Gestionar juegos",
+    "manage_clients_desc": "Muestra u oculta juegos en la barra lateral.",
+    "rename_clients": "Renombrar juegos",
+    "rename_clients_desc": "Ponle un nombre personalizado a cada juego.",
     "realmlist_editor": "Editor de realmlist",
     "realmlist_editor_desc": "Edita y guarda direcciones de servidor con historial rápido.",
     "addons_manager": "Gestor de addons",
@@ -85,14 +85,29 @@
     "update_awareness": "Detección de updates",
     "update_awareness_desc": "Detecta si hay una versión nueva del launcher."
   },
+  "plugins": {
+    "title": "Plugins",
+    "tabs": {
+        "installed": "Instalados",
+        "browse": "Explorar"
+    },
+    "no_plugins_installed": "No hay plugins instalados.",
+    "no_plugins_available": "No hay plugins disponibles.",
+    "install": "Instalar",
+    "uninstall": "Desinstalar",
+    "confirm_uninstall": "¿Seguro que quieres desinstalar {{name}}?",
+    "installing": "Instalando...",
+    "author": "Por {{author}}",
+    "version": "Versión {{version}}"
+  },
   "addons": {
     "title": "Gestor de Addons",
     "tabs": {
       "installed": "Instalados",
       "browse": "Explorar"
     },
-    "client_not_found": "Cliente no encontrado",
-    "client_not_found_desc": "Instala o localiza el cliente de <1>{{game}}</1> para ver y gestionar los addons.",
+    "client_not_found": "Juego no encontrado",
+    "client_not_found_desc": "Instala o localiza el juego <1>{{game}}</1> para ver y gestionar los addons.",
     "install_zip": "Instalar desde ZIP",
     "count_addons": "{{count}} addons",
     "loading": "Cargando addons...",
@@ -100,6 +115,10 @@
     "details": "Detalles",
     "uninstall": "Desinstalar",
     "search_placeholder": "Buscar addons...",
+    "sort_popular": "Más populares",
+    "sort_recent": "Añadidos recientemente",
+    "sort_az": "Nombre (A-Z)",
+    "sort_za": "Nombre (Z-A)",
     "sort": {
       "popularity": "Popularidad",
       "recently_added": "Añadidos recientemente",
@@ -133,11 +152,12 @@
   "topbar": {
     "minimize": "Minimizar",
     "maximize": "Maximizar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "support": "Apoyar proyecto"
   },
   "modals": {
     "game_not_found": "Juego no encontrado",
-    "locate_first": "Primero localiza el cliente del juego.",
+    "locate_first": "Primero localiza el juego.",
     "ok": "OK",
     "error": "Error",
     "success": "Listo",
@@ -145,19 +165,19 @@
     "save": "Guardar cambios",
     "done": "Hecho",
     "realmlist_title": "Editar realmlist",
-    "realmlist_desc": "El archivo realmlist le dice al juego a qué servidor conectarse. Para Warmane, debe ser: <1>set realmlist logon.warmane.com</1>",
+    "realmlist_desc": "El archivo realmlist le dice al juego a qué servidor conectarse. Ejemplo: <1>set realmlist logon.example.com</1>",
     "realmlist_error_read": "No se pudo leer el archivo realmlist.",
     "realmlist_success_update": "Realmlist actualizado.",
     "realmlist_error_update": "No se pudo actualizar el realmlist.",
     "quick_select": "Selección rápida / Historial:",
     "cache_cleared": "Caché borrada.",
     "cache_error": "Error al borrar la caché",
-    "manage_clients_title": "Gestionar clientes",
-    "manage_clients_desc": "Elige qué expansiones quieres ver en la barra lateral.",
-    "rename_client_title": "Renombrar cliente",
+    "manage_clients_title": "Gestionar juegos",
+    "manage_clients_desc": "Elige qué juegos quieres ver en la barra lateral.",
+    "rename_client_title": "Renombrar juego",
     "reset_default": "Restablecer",
     "save_name": "Guardar nombre",
-    "rename_desc": "Introduce un nombre personalizado para este cliente:",
+    "rename_desc": "Introduce un nombre personalizado para este juego:",
     "enter_name": "Escribe un nombre..."
   },
   "updater": {
@@ -171,6 +191,30 @@
     "complete_body": "¡World of Warcraft está listo para jugar!",
     "complete_modal_body": "¡Descarga terminada! Ya puedes jugar.",
     "unavailable_title": "Descarga no disponible",
-    "unavailable_body": "Ya no se pueden descargar clientes."
+    "unavailable_body": "Ya no se pueden descargar juegos."
+  },
+  "social": {
+    "title": "Social",
+    "favorites": "Favoritos",
+    "friends": "Amigos",
+    "online": "En línea",
+    "offline": "Desconectado",
+    "add_friend": "Añadir amigo",
+    "filter_friends": "Filtrar amigos",
+    "pending_requests": "solicitudes pendientes",
+    "status_online": "En línea",
+    "status_away": "Ausente",
+    "status_busy": "Ocupado",
+    "status_offline": "Desconectado",
+    "add_friend_title": "Añadir amigo",
+    "add_friend_desc": "Introduce el nombre de usuario del amigo.",
+    "add_friend_placeholder": "Usuario#1234",
+    "send_request": "Enviar solicitud",
+    "request_sent": "¡Solicitud enviada!",
+    "add_favorite": "Añadir a favoritos",
+    "remove_favorite": "Quitar de favoritos"
+  },
+  "chat": {
+    "placeholder": "Enviar mensaje..."
   }
 }
