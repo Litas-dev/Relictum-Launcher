@@ -16,7 +16,7 @@ import Dashboard from './components/views/Dashboard';
 import GameDetails from './components/views/GameDetails';
 import Settings from './components/views/Settings';
 import About from './components/views/About';
-import PluginsView from './components/views/PluginsView'; // Import
+import ExtensionsView from './components/views/ExtensionsView'; // Import
 import UpdateNotification from './components/UpdateNotification';
 // SocialPanel removed from here as it is now a separate window
 
@@ -25,8 +25,8 @@ import { games } from './config/games';
 import { themes } from './config/themes';
 import ipcRenderer from './utils/ipc';
 import { fetchWarperiaAddons } from './utils/addonUtils';
-import PluginLoader from './utils/PluginLoader';
-import PluginStore from './utils/PluginStore'; // Import Store
+import ExtensionLoader from './utils/ExtensionLoader';
+import ExtensionStore from './utils/ExtensionStore'; // Import Store
 
 // Hooks
 import { useGameLibrary } from './hooks/useGameLibrary';
@@ -84,18 +84,25 @@ function App() {
   const gameLibrary = useGameLibrary();
   const user = useUser();
 
-  // Effect: Subscribe to Plugin Store (Music & Custom Games & Sidebar & Default View)
+  // Effect: Subscribe to Extension Store (Music & Custom Games & Sidebar & Default View)
   useEffect(() => {
+      try {
+        const forceDash = localStorage.getItem('warmane_force_dashboard_on_reload');
+        if (forceDash === '1') {
+            setActiveView('dashboard');
+            localStorage.removeItem('warmane_force_dashboard_on_reload');
+        }
+      } catch (_) {}
       const updateStore = () => {
-          const override = PluginStore.getMusic();
+          const override = ExtensionStore.getMusic();
           setMusicUrl(override || wotlkTheme);
-          setCustomGames(PluginStore.getCustomGames());
-          setIsSidebarVisible(PluginStore.getSidebarVisible());
+          setCustomGames(ExtensionStore.getCustomGames());
+          setIsSidebarVisible(ExtensionStore.getSidebarVisible());
           
           // Check for default view override (only once per session or when changed)
-          const defaultView = PluginStore.getDefaultView();
+          const defaultView = ExtensionStore.getDefaultView();
           if (defaultView && !hasSetDefaultView) {
-              console.log("Applying Plugin Default View:", defaultView);
+              console.log("Applying Extension Default View:", defaultView);
               setActiveView(defaultView.view);
               if (defaultView.gameId) {
                   gameLibrary.setActiveGameId(defaultView.gameId);
@@ -104,13 +111,13 @@ function App() {
           }
 
           // Check for Navigation Request
-          const navRequest = PluginStore.getNavigationRequest();
+          const navRequest = ExtensionStore.getNavigationRequest();
           
           // If store was reset (navRequest is null), clear our ref so we are ready for next one
           if (!navRequest) {
               lastNavRequestRef.current = null;
           } else if (navRequest !== lastNavRequestRef.current) {
-               console.log("Processing Plugin Navigation:", navRequest);
+               console.log("Processing Extension Navigation:", navRequest);
                setActiveView(navRequest.view);
                if (navRequest.gameId) {
                    gameLibrary.setActiveGameId(navRequest.gameId);
@@ -119,7 +126,7 @@ function App() {
           }
       };
       updateStore();
-      return PluginStore.subscribe(updateStore);
+      return ExtensionStore.subscribe(updateStore);
   }, [hasSetDefaultView]); // Re-subscribe if hasSetDefaultView changes, but mainly relying on store notify
 
   // Effect: When music URL changes, if it was playing, keep playing
@@ -142,9 +149,9 @@ function App() {
   const allGames = [...games, ...customGames];
   const activeGame = allGames.find(g => g.id === gameLibrary.activeGameId) || games[0];
 
-  // Effect: Notify plugins when active game changes
+  // Effect: Notify extensions when active game changes
   useEffect(() => {
-    PluginLoader.triggerGameChange(gameLibrary.activeGameId);
+    ExtensionLoader.triggerGameChange(gameLibrary.activeGameId);
   }, [gameLibrary.activeGameId]);
   
   const downloader = useDownloader({
@@ -220,16 +227,16 @@ function App() {
 
     fetchAppInfo();
 
-    // Initialize Plugin System
-    PluginLoader.init();
+    // Initialize Extension System
+    ExtensionLoader.init();
 
-    // Listen for Plugin Toasts
-    const handlePluginToast = (e) => {
-      console.log("Plugin Toast Received:", e.detail);
+    // Listen for Extension Toasts
+    const handleExtensionToast = (e) => {
+      console.log("Extension Toast Received:", e.detail);
     };
 
-    window.addEventListener('plugin-toast', handlePluginToast);
-    return () => window.removeEventListener('plugin-toast', handlePluginToast);
+    window.addEventListener('extension-toast', handleExtensionToast);
+    return () => window.removeEventListener('extension-toast', handleExtensionToast);
   }, []);
 
   // Realmlist Logic
@@ -358,10 +365,10 @@ function App() {
     }
   };
 
-  // Plugin Page Content
-  const [pluginPageContent, setPluginPageContent] = useState(null);
+  // Extension Page Content
+  const [extensionPageContent, setExtensionPageContent] = useState(null);
   
-  // Effect: Listen for plugin realmlist requests
+  // Effect: Listen for extension realmlist requests
   useEffect(() => {
       const handleRealmlistRequest = (e) => {
           const { gameId } = e.detail;
@@ -371,28 +378,28 @@ function App() {
       return () => window.removeEventListener('open-realmlist-modal', handleRealmlistRequest);
   }, [gameLibrary.gamePaths]);
 
-  // Effect: Listen for sidebar visibility changes from plugins
+  // Effect: Listen for sidebar visibility changes from extensions
   useEffect(() => {
     const updateSidebarVisibility = () => {
-        setIsSidebarVisible(PluginStore.getSidebarVisible());
+        setIsSidebarVisible(ExtensionStore.getSidebarVisible());
     };
     updateSidebarVisibility(); // Initial check
-    return PluginStore.subscribe(updateSidebarVisibility);
+    return ExtensionStore.subscribe(updateSidebarVisibility);
   }, []);
 
   useEffect(() => {
     const updateContent = () => {
-        if (activeView.startsWith('plugin:')) {
+        if (activeView.startsWith('extension:')) {
             const pageId = activeView.split(':')[1];
-            const content = PluginStore.getPage(pageId);
-            setPluginPageContent(content);
+            const content = ExtensionStore.getPage(pageId);
+            setExtensionPageContent(content);
         } else {
-            setPluginPageContent(null);
+            setExtensionPageContent(null);
         }
     };
 
     updateContent();
-    return PluginStore.subscribe(updateContent);
+    return ExtensionStore.subscribe(updateContent);
   }, [activeView]);
 
   return (
@@ -530,8 +537,8 @@ function App() {
             />
           )}
 
-          {activeView === 'plugins-manager' && (
-            <PluginsView />
+          {activeView === 'extensions-manager' && (
+            <ExtensionsView />
           )}
 
           {activeView === 'about' && (
@@ -542,22 +549,22 @@ function App() {
             />
           )}
 
-          {/* Plugin View */}
-          {activeView.startsWith('plugin:') && (
+          {/* Extension View */}
+          {activeView.startsWith('extension:') && (
             <div style={{ padding: '2rem', color: '#fff', height: '100%', overflowY: 'auto' }}>
-                {pluginPageContent ? (
+                {extensionPageContent ? (
                     <div>
                         {/* DEBUG INFO */}
                         {/* <div style={{background: 'red', padding: '5px', marginBottom: '10px'}}>
-                            DEBUG: Page Loaded. Length: {pluginPageContent.length}
+                            DEBUG: Page Loaded. Length: {extensionPageContent.length}
                         </div> */}
-                        <div dangerouslySetInnerHTML={{ __html: pluginPageContent }} />
+                        <div dangerouslySetInnerHTML={{ __html: extensionPageContent }} />
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <h3>No content registered for this plugin page.</h3>
+                        <h3>No content registered for this extension page.</h3>
                         <p style={{color: '#888'}}>Page ID: {activeView.split(':')[1]}</p>
-                        <p style={{color: '#888'}}>Please try reloading the plugins or the application.</p>
+                        <p style={{color: '#888'}}>Please try reloading the extensions or the application.</p>
                     </div>
                 )}
             </div>

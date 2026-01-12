@@ -15,16 +15,16 @@
 
 ## 📖 Overview
 
-**Relictum Launcher** is a sophisticated, open-source platform designed to modernize how you interact with legacy game clients. Built with security and modularity at its core, it serves as a central hub for managing multiple game versions, ensuring client integrity, and extending functionality through a powerful plugin ecosystem.
+**Relictum Launcher** is a sophisticated, open-source platform designed to modernize how you interact with legacy game clients. Built with security and modularity at its core, it serves as a central hub for managing multiple game versions, ensuring client integrity, and extending functionality through a powerful extension ecosystem.
 
 It sets a new standard for client management with **Advanced Integrity Verification**, ensuring your game environment remains authentic and unmodified.
 
 ## ✨ Core Features
 
-### 🔌 Advanced Plugin Engine (New)
+### 🔌 Advanced Extension Engine (New)
 *   **Modular Architecture**: Extend the launcher's capabilities without modifying the core.
-*   **Community Extensions**: Install plugins to add new features, tools, or UI enhancements.
-*   **Custom Game Support**: Plugins can register and manage additional game versions or custom projects beyond the default supported clients.
+*   **Community Extensions**: Install extensions to add new features, tools, or UI enhancements.
+*   **Custom Game Support**: Extensions can register and manage additional game versions or custom projects beyond the default supported clients.
 *   **Sandboxed Execution**: Third-party code runs in a secure, isolated environment.
 
 ### 🛡️ Integrity & Security

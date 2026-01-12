@@ -9,7 +9,7 @@ export const useSettings = () => {
     const [defaultDownloadPath, setDefaultDownloadPath] = useState('');
     const [enableNotifications, setEnableNotifications] = useState(true);
     const [enableSoundEffects, setEnableSoundEffects] = useState(true);
-    const [enableGlowEffects, setEnableGlowEffects] = useState(true);
+    const [enableGlowEffects, setEnableGlowEffects] = useState(false);
 
     // Load settings from local storage
     useEffect(() => {

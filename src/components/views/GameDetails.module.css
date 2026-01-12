@@ -1,6 +1,6 @@
 .gameView {
   justify-content: flex-start;
-  padding-top: 100px;
+  padding-top: clamp(24px, 6vh, 48px);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -29,10 +29,17 @@
 
 .artContainer {
   position: relative;
-  display: inline-block;
-  width: fit-content;
-  max-width: 80%;
+  display: block;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
   overflow: visible;
+}
+
+@media (min-width: 1100px) and (min-height: 700px) {
+  .artContainer {
+    max-width: 615px;
+  }
 }
 
 .gameHeaderArt {
@@ -42,6 +49,8 @@
   border-radius: 8px;
   transition: filter 0.3s ease;
 }
+
+
 
 .overlayIcon {
   position: absolute;
@@ -63,8 +72,8 @@
 
 .gameInfoActions {
   width: 100%;
-  margin-top: 40px; /* Moved down to avoid overlapping with art */
-  z-index: 101; /* Above art */
+  margin-top: clamp(16px, 4vh, 32px);
+  z-index: 101;
   align-items: center;
   border-top: none;
   padding-top: 10px;

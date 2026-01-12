@@ -1,7 +1,7 @@
 {
   "name": "relictum-launcher",
   "private": true,
-  "version": "3.4.5",
+  "version": "3.4.0",
   "author": "Relictum",
   "description": "The ultimate, secure, and modern launcher for private servers.",
   "repository": {
@@ -52,7 +52,7 @@
       }
     ],
     "directories": {
-      "output": "dist_v3.4.5"
+      "output": "dist_v3.4.0"
     },
     "files": [
       "electron/**/*",

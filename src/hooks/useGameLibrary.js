@@ -39,7 +39,7 @@ export const useGameLibrary = () => {
 
         loadPaths();
         
-        // Listen for updates from plugins
+        // Listen for updates from extensions
         window.addEventListener('warmane-game-paths-updated', loadPaths);
         return () => window.removeEventListener('warmane-game-paths-updated', loadPaths);
     }, []);

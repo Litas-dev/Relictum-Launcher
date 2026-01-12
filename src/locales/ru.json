@@ -85,14 +85,14 @@
     "update_awareness": "Проверка обновлений",
     "update_awareness_desc": "Сообщает, если вышла новая версия лаунчера."
   },
-  "plugins": {
-    "title": "Плагины",
+  "extensions": {
+    "title": "Расширения",
     "tabs": {
         "installed": "Установленные",
         "browse": "Обзор"
     },
-    "no_plugins_installed": "Плагины не установлены.",
-    "no_plugins_available": "Нет доступных плагинов.",
+    "no_plugins_installed": "Расширения не установлены.",
+    "no_plugins_available": "Нет доступных расширений.",
     "install": "Установить",
     "uninstall": "Удалить",
     "confirm_uninstall": "Вы уверены, что хотите удалить {{name}}?",

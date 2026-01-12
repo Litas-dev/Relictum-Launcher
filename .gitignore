@@ -17,3 +17,8 @@ src/utils/PluginLoader.js
 src/utils/PluginStore.js
 plugins/
 plugins.json
+
+# Proprietary Extension Engine
+src/utils/ExtensionLoader.js
+src/utils/ExtensionStore.js
+extensions/

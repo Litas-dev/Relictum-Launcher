@@ -9,7 +9,7 @@
 }
 
 .heroSection {
-  padding: 20px 20px 140px 20px;
+  padding: 20px 20px clamp(60px, 12vh, 140px) 20px;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -271,7 +271,7 @@
   padding: 0; /* Removed padding to save space */
   width: 100%;
   flex-wrap: nowrap;
-  margin-top: 50px; /* Increased from 5px to push cards down */
+  margin-top: clamp(10px, 5vh, 40px);
 }
 
 .gameIconCard {
@@ -288,7 +288,8 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(5px);
   width: auto;
-  min-width: 160px; /* Keep it compact */
+  min-width: clamp(140px, 14vw, 160px);
+  overflow: hidden;
 }
 
 .gameIconCard:hover {
@@ -298,8 +299,8 @@
 }
 
 .iconGlow {
-  width: 190px; /* Big enough for the icon */
-  height: 190px;
+  width: clamp(140px, 12vw, 190px);
+  height: clamp(140px, 12vw, 190px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,8 +314,8 @@
 /* Glow effects for each game type - Applied to the image wrapper or image itself via drop-shadow */
 
 .gameIcon {
-  width: 190px; /* Large icons (approx 50% bigger than 130px) */
-  height: 190px;
+  width: clamp(140px, 12vw, 190px);
+  height: clamp(140px, 12vw, 190px);
   object-fit: contain;
   transition: all 0.5s ease;
   filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));

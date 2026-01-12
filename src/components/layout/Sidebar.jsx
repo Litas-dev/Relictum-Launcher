@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Home, Layers, Plus, Puzzle, Settings, Info, AlertTriangle, Music, Download, Globe, Heart, Box } from 'lucide-react';
 import { games } from '../../config/games';
 import ipcRenderer from '../../utils/ipc';
-import PluginStore from '../../utils/PluginStore';
+import ExtensionStore from '../../utils/ExtensionStore';
 import azerothLogo from '../../assets/logo-new-white.png';
 import styles from './Sidebar.module.css';
 
@@ -37,18 +37,18 @@ const Sidebar = ({
     onRenameGame
 }) => {
     const { t } = useTranslation();
-    const [pluginItems, setPluginItems] = useState([]);
+    const [extensionItems, setExtensionItems] = useState([]);
     const [customGames, setCustomGames] = useState([]);
 
     useEffect(() => {
-        const updatePlugins = () => {
-            setPluginItems([...PluginStore.getMenuItems()]);
-            setCustomGames([...PluginStore.getCustomGames()]);
+        const updateExtensions = () => {
+            setExtensionItems([...ExtensionStore.getMenuItems()]);
+            setCustomGames([...ExtensionStore.getCustomGames()]);
         };
         // Initial load
-        updatePlugins();
+        updateExtensions();
         // Subscribe
-        return PluginStore.subscribe(updatePlugins);
+        return ExtensionStore.subscribe(updateExtensions);
     }, []);
 
     const allGames = [...games, ...customGames];
@@ -110,11 +110,11 @@ const Sidebar = ({
                     <Plus size={14} /> <span>{t('sidebar.manage_clients')}</span>
                 </button>
 
-                {pluginItems.length > 0 && (
+                {extensionItems.length > 0 && (
                     <>
-                        <div className={styles.navLabel}>Plugins</div>
-                        {pluginItems.map(item => {
-                            const viewId = item.onClickId.startsWith('plugin:') ? item.onClickId : `plugin:${item.onClickId}`;
+                        <div className={styles.navLabel}>{t('extensions.title')}</div>
+                        {extensionItems.map(item => {
+                            const viewId = item.onClickId.startsWith('extension:') ? item.onClickId : `extension:${item.onClickId}`;
                             return (
                                 <button
                                     key={item.id}
@@ -137,10 +137,10 @@ const Sidebar = ({
                 </button>
 
                 <button 
-                    className={`${styles.navItem} ${activeView === 'plugins-manager' ? styles.active : ''}`}
-                    onClick={() => setActiveView('plugins-manager')}
+                    className={`${styles.navItem} ${activeView === 'extensions-manager' ? styles.active : ''}`}
+                    onClick={() => setActiveView('extensions-manager')}
                 >
-                    <Box size={18} /> <span>Plugins</span>
+                    <Box size={18} /> <span>{t('extensions.title')}</span>
                 </button>
 
                 <button 

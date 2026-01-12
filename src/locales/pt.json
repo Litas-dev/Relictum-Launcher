@@ -85,14 +85,14 @@
     "update_awareness": "Verificação de updates",
     "update_awareness_desc": "Detecta quando existe uma nova versão do launcher."
   },
-  "plugins": {
-    "title": "Plugins",
+  "extensions": {
+    "title": "Extensões",
     "tabs": {
         "installed": "Instalados",
         "browse": "Explorar"
     },
-    "no_plugins_installed": "Nenhum plugin instalado.",
-    "no_plugins_available": "Nenhum plugin disponível.",
+    "no_plugins_installed": "Nenhuma extensão instalada.",
+    "no_plugins_available": "Nenhuma extensão disponível.",
     "install": "Instalar",
     "uninstall": "Desinstalar",
     "confirm_uninstall": "Tem certeza que deseja desinstalar {{name}}?",

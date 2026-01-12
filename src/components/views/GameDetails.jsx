@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Play, Globe, FolderSearch, Puzzle, Settings, Image as ImageIcon, User, Camera, Palette, Edit } from 'lucide-react';
 import styles from './GameDetails.module.css';
 import ipcRenderer from '../../utils/ipc';
-import PluginStore from '../../utils/PluginStore';
+import ExtensionStore from '../../utils/ExtensionStore';
 
 const GameDetails = ({
   activeGame,
@@ -19,20 +19,20 @@ const GameDetails = ({
   const { t } = useTranslation();
   const [detectedVersion, setDetectedVersion] = useState(null);
   const [isVersionCompatible, setIsVersionCompatible] = useState(true);
-  const [pluginActions, setPluginActions] = useState([]);
-  const [pluginWidgets, setPluginWidgets] = useState([]);
+  const [extensionActions, setExtensionActions] = useState([]);
+  const [extensionWidgets, setExtensionWidgets] = useState([]);
   const [gameImages, setGameImages] = useState({});
   const [gameGlow, setGameGlow] = useState(null);
 
   useEffect(() => {
     const updateActions = () => {
-        setPluginActions([...PluginStore.getGameActions()]);
-        setPluginWidgets([...PluginStore.getGameDetailsWidgets()]);
-        setGameImages(PluginStore.getGameImages(activeGameId));
-        setGameGlow(PluginStore.getGameGlow(activeGameId));
+        setExtensionActions([...ExtensionStore.getGameActions()]);
+        setExtensionWidgets([...ExtensionStore.getGameDetailsWidgets()]);
+        setGameImages(ExtensionStore.getGameImages(activeGameId));
+        setGameGlow(ExtensionStore.getGameGlow(activeGameId));
     };
     updateActions();
-    return PluginStore.subscribe(updateActions);
+    return ExtensionStore.subscribe(updateActions);
   }, [activeGameId]);
 
   useEffect(() => {
@@ -132,7 +132,7 @@ const GameDetails = ({
                     <Settings size={24} />
                 </button>
 
-                {pluginActions.map(action => {
+                {extensionActions.map(action => {
                     if (action.condition && !action.condition(activeGame)) return null;
                     const IconComponent = (action.icon && {
                         'puzzle': Puzzle,
@@ -152,7 +152,7 @@ const GameDetails = ({
                                 if (typeof action.callback === 'function') {
                                     action.callback(activeGame);
                                 } else if (typeof action.callback === 'string') {
-                                    console.warn("Plugin action callback is not a function", action);
+                                    console.warn("Extension action callback is not a function", action);
                                 }
                             }}
                             title={action.label}
@@ -170,9 +170,9 @@ const GameDetails = ({
                   <button id="locate-button" className={styles.locateButton} onClick={onLocateGame}>
                     <FolderSearch size={16} /> {t('game_details.locate_game')}
                   </button>
-                  {pluginActions.length > 0 && (
+                  {extensionActions.length > 0 && (
                     <div style={{ display: 'flex', gap: '10px', marginLeft: '10px', flexWrap: 'wrap' }}>
-                        {pluginActions.map(action => {
+                        {extensionActions.map(action => {
                             if (action.condition && !action.condition(activeGame)) return null;
                             const IconComponent = (action.icon && {
                                 'puzzle': Puzzle,
@@ -231,10 +231,10 @@ const GameDetails = ({
         </div>
       </div>
 
-      {pluginWidgets.length > 0 && (
-          <div id="plugin-widgets-area" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {pluginWidgets.map(widget => (
-                  <div key={widget.id} id={widget.id} className="plugin-widget" style={{
+      {extensionWidgets.length > 0 && (
+          <div id="extension-widgets-area" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {extensionWidgets.map(widget => (
+                  <div key={widget.id} id={widget.id} className="extension-widget" style={{
                       background: 'rgba(0,0,0,0.3)',
                       border: '1px solid rgba(255,255,255,0.05)',
                       borderRadius: '8px',

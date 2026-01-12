@@ -85,14 +85,14 @@
     "update_awareness": "Update-Erkennung",
     "update_awareness_desc": "Erkennt verfügbare Launcher-Updates."
   },
-  "plugins": {
-    "title": "Plugins",
+  "extensions": {
+    "title": "Erweiterungen",
     "tabs": {
         "installed": "Installiert",
         "browse": "Durchsuchen"
     },
-    "no_plugins_installed": "Keine Plugins installiert.",
-    "no_plugins_available": "Keine Plugins verfügbar.",
+    "no_plugins_installed": "Keine Erweiterungen installiert.",
+    "no_plugins_available": "Keine Erweiterungen verfügbar.",
     "install": "Installieren",
     "uninstall": "Deinstallieren",
     "confirm_uninstall": "Möchtest du {{name}} wirklich deinstallieren?",

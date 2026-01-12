@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Trash2, ChevronDown, FolderOpen, X, Globe } from 'lucide-react';
 import styles from './Settings.module.css';
 import { themes } from '../../config/themes';
-import PluginStore from '../../utils/PluginStore';
+import ExtensionStore from '../../utils/ExtensionStore';
 
 /**
  * Settings Component
@@ -35,18 +35,18 @@ const Settings = ({
   const [activeTab, setActiveTab] = useState('general');
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [pluginWidgets, setPluginWidgets] = useState({ general: [], appearance: [], system: [] });
+  const [extensionWidgets, setExtensionWidgets] = useState({ general: [], appearance: [], system: [] });
 
   useEffect(() => {
     const updateWidgets = () => {
-        setPluginWidgets({
-            general: [...PluginStore.getSettingsWidgets('general')],
-            appearance: [...PluginStore.getSettingsWidgets('appearance')],
-            system: [...PluginStore.getSettingsWidgets('system')]
+        setExtensionWidgets({
+            general: [...ExtensionStore.getSettingsWidgets('general')],
+            appearance: [...ExtensionStore.getSettingsWidgets('appearance')],
+            system: [...ExtensionStore.getSettingsWidgets('system')]
         });
     };
 
-    const unsubscribe = PluginStore.subscribe(updateWidgets);
+    const unsubscribe = ExtensionStore.subscribe(updateWidgets);
     updateWidgets();
     return unsubscribe;
   }, []);
@@ -138,7 +138,7 @@ const Settings = ({
               </div>
             </div>
 
-            {pluginWidgets.general.map(widget => (
+            {extensionWidgets.general.map(widget => (
               <div key={widget.id} className={styles.settingsSection}>
                  {widget.title && <h3>{widget.title}</h3>}
                  <div dangerouslySetInnerHTML={{ __html: widget.content }} />
@@ -205,7 +205,7 @@ const Settings = ({
               </div>
             </div>
 
-            {pluginWidgets.appearance.map(widget => (
+            {extensionWidgets.appearance.map(widget => (
               <div key={widget.id} className={styles.settingsSection}>
                  {widget.title && <h3>{widget.title}</h3>}
                  <div dangerouslySetInnerHTML={{ __html: widget.content }} />
@@ -282,7 +282,7 @@ const Settings = ({
               </div>
             </div>
 
-            {pluginWidgets.system.map(widget => (
+            {extensionWidgets.system.map(widget => (
               <div key={widget.id} className={styles.settingsSection}>
                  {widget.title && <h3>{widget.title}</h3>}
                  <div dangerouslySetInnerHTML={{ __html: widget.content }} />

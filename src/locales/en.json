@@ -85,14 +85,14 @@
     "update_awareness": "Update Awareness",
     "update_awareness_desc": "Detect launcher updates and version status."
   },
-  "plugins": {
-    "title": "Plugins",
+  "extensions": {
+    "title": "Extensions",
     "tabs": {
         "installed": "Installed",
         "browse": "Browse"
     },
-    "no_plugins_installed": "No plugins installed.",
-    "no_plugins_available": "No plugins available.",
+    "no_extensions_installed": "No extensions installed.",
+    "no_extensions_available": "No extensions available.",
     "install": "Install",
     "uninstall": "Uninstall",
     "confirm_uninstall": "Are you sure you want to uninstall {{name}}?",

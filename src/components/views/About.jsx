@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, ExternalLink, Users, Edit, Globe, Puzzle, Trash2, Palette, Music, RefreshCw, CheckCircle } from 'lucide-react';
 import styles from './About.module.css';
-import PluginStore from '../../utils/PluginStore';
+import ExtensionStore from '../../utils/ExtensionStore';
 
 const About = ({ appVersion, integrityStatus, integrityHash }) => {
   const { t } = useTranslation();
-  const [pluginWidgets, setPluginWidgets] = useState([]);
+  const [extensionWidgets, setExtensionWidgets] = useState([]);
 
   useEffect(() => {
     const updateWidgets = () => {
-        setPluginWidgets([...PluginStore.getAboutWidgets()]);
+        setExtensionWidgets([...ExtensionStore.getAboutWidgets()]);
     };
 
-    const unsubscribe = PluginStore.subscribe(updateWidgets);
+    const unsubscribe = ExtensionStore.subscribe(updateWidgets);
     updateWidgets();
     return unsubscribe;
   }, []);
@@ -129,18 +129,20 @@ const About = ({ appVersion, integrityStatus, integrityHash }) => {
             <span>{t('about.update_awareness_desc')}</span>
           </div>
         </div>
-      </div>
 
-      {pluginWidgets.length > 0 && (
-        <div className={styles.pluginWidgetsSection}>
-          {pluginWidgets.map(widget => (
-            <div key={widget.id} className={styles.pluginWidget}>
-              {widget.title && <h3>{widget.title}</h3>}
-              <div dangerouslySetInnerHTML={{ __html: widget.content }} />
+        {/* Extension Widgets */}
+        {extensionWidgets.map((widget, idx) => (
+            <div key={idx} className={styles.gameItem}>
+                <div className={styles.gameIconWrapper}>
+                    {widget.icon ? <img src={widget.icon} style={{width: 24, height: 24}} /> : <CheckCircle size={24} color="#fbbf24" />}
+                </div>
+                <div className={styles.gameInfo}>
+                    <h4>{widget.title}</h4>
+                    <span>{widget.description}</span>
+                </div>
             </div>
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 };

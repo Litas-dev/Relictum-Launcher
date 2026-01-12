@@ -262,30 +262,30 @@ ipcMain.handle('open-external', async (event, url) => {
     }
 });
 
-ipcMain.handle('install-remote-plugin', async (event, { url, id }) => {
+ipcMain.handle('install-remote-extension', async (event, { url, id }) => {
     try {
-        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
-        if (!fs.existsSync(pluginsDir)) {
-            fs.mkdirSync(pluginsDir, { recursive: true });
+        const extensionsDir = path.join(app.getPath('userData'), 'extensions');
+        if (!fs.existsSync(extensionsDir)) {
+            fs.mkdirSync(extensionsDir, { recursive: true });
         }
         
-        // Sanitize plugin ID (folder name)
+        // Sanitize extension ID (folder name)
         const safeId = path.basename(id);
         if (safeId !== id || !id) {
-             throw new Error("Invalid plugin ID");
+             throw new Error("Invalid extension ID");
         }
         
-        const pluginDir = path.join(pluginsDir, safeId);
-        if (!fs.existsSync(pluginDir)) {
-            fs.mkdirSync(pluginDir, { recursive: true });
+        const extensionDir = path.join(extensionsDir, safeId);
+        if (!fs.existsSync(extensionDir)) {
+            fs.mkdirSync(extensionDir, { recursive: true });
         }
         
         // 1. Download Manifest
         // The URL provided is expected to be the MANIFEST URL
         const manifestUrl = url;
-        const manifestPath = path.join(pluginDir, 'manifest.json');
+        const manifestPath = path.join(extensionDir, 'manifest.json');
         
-        console.log(`[Plugin Install] Downloading manifest from ${manifestUrl}`);
+        console.log(`[Extension Install] Downloading manifest from ${manifestUrl}`);
         
         await new Promise((resolve, reject) => {
              const request = electronNet.request(manifestUrl);
@@ -311,7 +311,7 @@ ipcMain.handle('install-remote-plugin', async (event, { url, id }) => {
         // 3. Download Main Script
         // Assume script is in same folder as manifest
         const scriptUrl = manifestUrl.substring(0, manifestUrl.lastIndexOf('/')) + '/' + mainScript;
-        const scriptPath = path.join(pluginDir, mainScript);
+        const scriptPath = path.join(extensionDir, mainScript);
         
         // Ensure script directory exists
         const scriptDir = path.dirname(scriptPath);
@@ -319,7 +319,7 @@ ipcMain.handle('install-remote-plugin', async (event, { url, id }) => {
             fs.mkdirSync(scriptDir, { recursive: true });
         }
 
-        console.log(`[Plugin Install] Downloading script from ${scriptUrl}`);
+        console.log(`[Extension Install] Downloading script from ${scriptUrl}`);
 
         await new Promise((resolve, reject) => {
              const request = electronNet.request(scriptUrl);
@@ -339,24 +339,49 @@ ipcMain.handle('install-remote-plugin', async (event, { url, id }) => {
 
         return { success: true };
     } catch (e) {
-        console.error("Install plugin error:", e);
+        console.error("Install extension error:", e);
         return { success: false, error: e.message };
     }
 });
 
-ipcMain.handle('uninstall-plugin', async (event, filename) => {
+ipcMain.handle('uninstall-extension', async (event, filename) => {
     try {
-        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
+        const extensionsDir = path.join(app.getPath('userData'), 'extensions');
         const safeFilename = path.basename(filename);
-        const targetPath = path.join(pluginsDir, safeFilename);
+        const targetPath = path.join(extensionsDir, safeFilename);
         
         if (fs.existsSync(targetPath)) {
-            // Updated to support directory deletion for folder-based plugins
+            // Updated to support directory deletion for folder-based extensions
             fs.rmSync(targetPath, { recursive: true, force: true });
             return { success: true };
         } else {
-            return { success: false, error: "Plugin not found" };
+            return { success: false, error: "Extension not found" };
         }
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('fetch-remote-json', async (event, url) => {
+    try {
+        const text = await new Promise((resolve, reject) => {
+            const request = electronNet.request(url);
+            request.setHeader('Accept', 'application/json');
+            request.on('response', (response) => {
+                if (response.statusCode !== 200) {
+                    reject(new Error(`HTTP ${response.statusCode}`));
+                    return;
+                }
+                let data = '';
+                response.on('data', (chunk) => {
+                    data += chunk.toString('utf8');
+                });
+                response.on('end', () => resolve(data));
+            });
+            request.on('error', (err) => reject(err));
+            request.end();
+        });
+        return { success: true, text };
     } catch (e) {
         return { success: false, error: e.message };
     }
@@ -644,33 +669,33 @@ ipcMain.on('open-url', (event, url) => {
     shell.openExternal(url);
 });
 
-// --- Plugin System ---
-let hasSyncedDevPlugins = false;
+// --- Extension System ---
+let hasSyncedDevExtensions = false;
 
-ipcMain.handle('load-plugins', async () => {
+ipcMain.handle('load-extensions', async () => {
     try {
-        const pluginsDir = path.join(app.getPath('userData'), 'plugins');
+        const extensionsDir = path.join(app.getPath('userData'), 'extensions');
         
-        if (!fs.existsSync(pluginsDir)) {
-            fs.mkdirSync(pluginsDir, { recursive: true });
+        if (!fs.existsSync(extensionsDir)) {
+            fs.mkdirSync(extensionsDir, { recursive: true });
         }
 
         // Dev-mode sync: Sync local folders to userData (Always sync in dev to allow hot-reloading)
         if (!app.isPackaged) {
-            // hasSyncedDevPlugins = true; 
-            const localPluginsDir = path.join(__dirname, '../plugins');
-            if (fs.existsSync(localPluginsDir)) {
-                const entries = fs.readdirSync(localPluginsDir, { withFileTypes: true });
+            // hasSyncedDevExtensions = true; 
+            const localExtensionsDir = path.join(__dirname, '../extensions');
+            if (fs.existsSync(localExtensionsDir)) {
+                const entries = fs.readdirSync(localExtensionsDir, { withFileTypes: true });
                 for (const entry of entries) {
                     if (entry.isDirectory()) {
-                        const srcDir = path.join(localPluginsDir, entry.name);
-                        const destDir = path.join(pluginsDir, entry.name);
+                        const srcDir = path.join(localExtensionsDir, entry.name);
+                        const destDir = path.join(extensionsDir, entry.name);
                         
                         // Simple sync: if not exists or dev forced, copy recursively
                         if (!fs.existsSync(destDir)) {
                              // Using simple cp recursive
                              fs.cpSync(srcDir, destDir, { recursive: true });
-                             console.log(`[Plugin System] Synced dev plugin folder: ${entry.name}`);
+                             console.log(`[Extension System] Synced dev extension folder: ${entry.name}`);
                         } else {
                             // Update content if exists (basic copy over)
                             fs.cpSync(srcDir, destDir, { recursive: true, force: true });
@@ -680,24 +705,24 @@ ipcMain.handle('load-plugins', async () => {
             }
         }
 
-        const entries = fs.readdirSync(pluginsDir, { withFileTypes: true });
-        const plugins = [];
+        const entries = fs.readdirSync(extensionsDir, { withFileTypes: true });
+        const extensions = [];
         
         for (const entry of entries) {
             if (entry.isDirectory()) {
-                const pluginDir = path.join(pluginsDir, entry.name);
-                const manifestPath = path.join(pluginDir, 'manifest.json');
+                const extensionDir = path.join(extensionsDir, entry.name);
+                const manifestPath = path.join(extensionDir, 'manifest.json');
                 
                 if (fs.existsSync(manifestPath)) {
                     try {
                         const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
                         const mainFile = manifest.main || 'index.js';
-                        const mainPath = path.join(pluginDir, mainFile);
+                        const mainPath = path.join(extensionDir, mainFile);
                         
                         if (fs.existsSync(mainPath)) {
                             const content = fs.readFileSync(mainPath, 'utf8');
                             
-                            plugins.push({
+                            extensions.push({
                                 name: entry.name, // Use folder name as ID/Name key
                                 path: mainPath,
                                 content: content,
@@ -705,22 +730,22 @@ ipcMain.handle('load-plugins', async () => {
                             });
                         }
                     } catch (e) {
-                        console.error(`Error loading plugin ${entry.name}:`, e);
+                        console.error(`Error loading extension ${entry.name}:`, e);
                     }
                 }
             }
         }
-        return plugins;
+        return extensions;
     } catch (e) {
-        console.error("Error loading plugins:", e);
+        console.error("Error loading extensions:", e);
         return [];
     }
 });
 
-// --- Plugin Download & File Operations ---
+// --- Extension Download & File Operations ---
 
-// Plugin System Info
-    ipcMain.handle('plugin-get-system-info', async () => {
+// Extension System Info
+    ipcMain.handle('extension-get-system-info', async () => {
         const os = require('os');
         return {
             platform: os.platform(),
@@ -734,18 +759,36 @@ ipcMain.handle('load-plugins', async () => {
         };
     });
 
-    // Plugin Open Path
-    ipcMain.on('plugin-open-path', (event, path) => {
-        shell.openPath(path);
-    });
+    // Extension Open Path
+ipcMain.on('extension-open-path', (event, path) => {
+    shell.openPath(path);
+});
 
-    ipcMain.on('plugin-download-file', (event, { url, savePath, id }) => {
+ipcMain.handle('extension-read-image', async (event, filePath) => {
+    try {
+        if (!filePath) return { success: false, error: 'No path' };
+        if (!fs.existsSync(filePath)) return { success: false, error: 'Not found' };
+        const ext = path.extname(filePath).toLowerCase();
+        let mime = 'application/octet-stream';
+        if (ext === '.png') mime = 'image/png';
+        else if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
+        else if (ext === '.gif') mime = 'image/gif';
+        else if (ext === '.webp') mime = 'image/webp';
+        const buf = fs.readFileSync(filePath);
+        const base64 = buf.toString('base64');
+        return { success: true, dataUrl: `data:${mime};base64,${base64}` };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+    ipcMain.on('extension-download-file', (event, { url, savePath, id }) => {
     try {
         const file = fs.createWriteStream(savePath);
         
         file.on('error', (err) => {
-            console.error("[Plugin] File Write Error:", err);
-            event.reply('plugin-download-error', { id, error: err.message });
+            console.error("[Extension] File Write Error:", err);
+            event.reply('extension-download-error', { id, error: err.message });
         });
 
         const request = electronNet.request(url);
@@ -754,7 +797,7 @@ ipcMain.handle('load-plugins', async () => {
             if (response.statusCode !== 200) {
                 file.end();
                 fs.unlink(savePath, () => {});
-                event.reply('plugin-download-error', { id, error: 'Status Code: ' + response.statusCode });
+                event.reply('extension-download-error', { id, error: 'Status Code: ' + response.statusCode });
                 return;
             }
 
@@ -768,35 +811,35 @@ ipcMain.handle('load-plugins', async () => {
                 const progress = totalBytes ? (downloadedBytes / totalBytes) * 100 : 0;
                 // Send progress every ~1% or so to avoid flooding IPC? 
                 // For now, send every chunk but maybe throttle in renderer.
-                event.reply('plugin-download-progress', { id, progress, downloadedBytes, totalBytes });
+                event.reply('extension-download-progress', { id, progress, downloadedBytes, totalBytes });
             });
 
             response.on('end', () => {
                 file.end();
-                event.reply('plugin-download-complete', { id, path: savePath });
+                event.reply('extension-download-complete', { id, path: savePath });
             });
             
             response.on('error', (err) => {
                 file.end();
                 fs.unlink(savePath, () => {});
-                event.reply('plugin-download-error', { id, error: err.message });
+                event.reply('extension-download-error', { id, error: err.message });
             });
         });
 
         request.on('error', (err) => {
             fs.unlink(savePath, () => {});
-            event.reply('plugin-download-error', { id, error: err.message });
+            event.reply('extension-download-error', { id, error: err.message });
         });
 
         request.end();
     } catch (e) {
-        event.reply('plugin-download-error', { id, error: e.message });
+        event.reply('extension-download-error', { id, error: e.message });
     }
 });
 
-ipcMain.handle('plugin-extract-file', async (event, { filePath, destPath }) => {
+ipcMain.handle('extension-extract-file', async (event, { filePath, destPath }) => {
     try {
-        console.log(`[Plugin] Extracting ${filePath} to ${destPath}`);
+        console.log(`[Extension] Extracting ${filePath} to ${destPath}`);
         if (!fs.existsSync(filePath)) throw new Error("File not found");
         
         // Ensure destination exists
@@ -810,7 +853,7 @@ ipcMain.handle('plugin-extract-file', async (event, { filePath, destPath }) => {
         
         return { success: true };
     } catch (e) {
-        console.error("[Plugin] Extraction failed:", e);
+        console.error("[Extension] Extraction failed:", e);
         return { success: false, error: e.message };
     }
 });

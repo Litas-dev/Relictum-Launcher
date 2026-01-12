@@ -3,7 +3,7 @@ import { useTranslation, Trans } from 'react-i18next';
 import styles from './Dashboard.module.css';
 import { games } from '../../config/games';
 import ipcRenderer from '../../utils/ipc';
-import PluginStore from '../../utils/PluginStore';
+import ExtensionStore from '../../utils/ExtensionStore';
 import { Users, Dices } from 'lucide-react';
 import titleImage from '../../assets/logo-new-white.png';
 
@@ -40,19 +40,19 @@ const Dashboard = ({ games, onGameSelect, settings, user }) => {
     if (e.key === 'Escape') setIsEditingName(false);
   };
 
-  // Plugin Image Overrides
+  // Extension Image Overrides
   const [gameOverrides, setGameOverrides] = useState({});
 
   useEffect(() => {
     const update = () => {
         const overrides = {};
         games.forEach(g => {
-            overrides[g.id] = PluginStore.getGameImages(g.id);
+            overrides[g.id] = ExtensionStore.getGameImages(g.id);
         });
         setGameOverrides(overrides);
     };
     update();
-    return PluginStore.subscribe(update);
+    return ExtensionStore.subscribe(update);
   }, [games]);
 
   const enableGlows = settings?.enableGlowEffects !== false; // Default to true if undefined
