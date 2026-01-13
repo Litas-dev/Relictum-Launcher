@@ -13,28 +13,28 @@ export const useSettings = () => {
 
     // Load settings from local storage
     useEffect(() => {
-        const savedTheme = localStorage.getItem('warmane_theme');
+        const savedTheme = localStorage.getItem('relictum_theme') || localStorage.getItem('warmane_theme');
         if (savedTheme && themes[savedTheme]) setCurrentTheme(savedTheme);
 
-        const savedAutoClose = localStorage.getItem('warmane_auto_close');
+        const savedAutoClose = localStorage.getItem('relictum_auto_close') || localStorage.getItem('warmane_auto_close');
         if (savedAutoClose) setAutoCloseLauncher(JSON.parse(savedAutoClose));
 
-        const savedPlayMusic = localStorage.getItem('warmane_play_music_on_startup');
+        const savedPlayMusic = localStorage.getItem('relictum_play_music_on_startup') || localStorage.getItem('warmane_play_music_on_startup');
         if (savedPlayMusic) setPlayMusicOnStartup(JSON.parse(savedPlayMusic));
 
-        const savedClearCache = localStorage.getItem('warmane_clear_cache');
+        const savedClearCache = localStorage.getItem('relictum_clear_cache') || localStorage.getItem('warmane_clear_cache');
         if (savedClearCache) setClearCacheOnLaunch(JSON.parse(savedClearCache));
 
-        const savedDefaultPath = localStorage.getItem('warmane_default_download_path');
+        const savedDefaultPath = localStorage.getItem('relictum_default_download_path') || localStorage.getItem('warmane_default_download_path');
         if (savedDefaultPath) setDefaultDownloadPath(savedDefaultPath);
 
-        const savedNotifications = localStorage.getItem('warmane_notifications');
+        const savedNotifications = localStorage.getItem('relictum_notifications') || localStorage.getItem('warmane_notifications');
         if (savedNotifications) setEnableNotifications(JSON.parse(savedNotifications));
 
-        const savedSoundEffects = localStorage.getItem('warmane_sound_effects');
+        const savedSoundEffects = localStorage.getItem('relictum_sound_effects') || localStorage.getItem('warmane_sound_effects');
         if (savedSoundEffects) setEnableSoundEffects(JSON.parse(savedSoundEffects));
 
-        const savedGlowEffects = localStorage.getItem('warmane_glow_effects');
+        const savedGlowEffects = localStorage.getItem('relictum_glow_effects') || localStorage.getItem('warmane_glow_effects');
         if (savedGlowEffects) setEnableGlowEffects(JSON.parse(savedGlowEffects));
     }, []);
 
@@ -46,7 +46,7 @@ export const useSettings = () => {
             Object.entries(theme.colors).forEach(([key, value]) => {
                 root.style.setProperty(key, value);
             });
-            localStorage.setItem('warmane_theme', currentTheme);
+            localStorage.setItem('relictum_theme', currentTheme);
         }
     }, [currentTheme]);
 
@@ -56,42 +56,42 @@ export const useSettings = () => {
     const toggleAutoClose = () => {
         const newValue = !autoCloseLauncher;
         setAutoCloseLauncher(newValue);
-        localStorage.setItem('warmane_auto_close', JSON.stringify(newValue));
+        localStorage.setItem('relictum_auto_close', JSON.stringify(newValue));
     };
 
     const togglePlayMusic = () => {
         const newValue = !playMusicOnStartup;
         setPlayMusicOnStartup(newValue);
-        localStorage.setItem('warmane_play_music_on_startup', JSON.stringify(newValue));
+        localStorage.setItem('relictum_play_music_on_startup', JSON.stringify(newValue));
     };
 
     const toggleClearCache = () => {
         const newValue = !clearCacheOnLaunch;
         setClearCacheOnLaunch(newValue);
-        localStorage.setItem('warmane_clear_cache', JSON.stringify(newValue));
+        localStorage.setItem('relictum_clear_cache', JSON.stringify(newValue));
     };
 
     const toggleNotifications = () => {
         const newValue = !enableNotifications;
         setEnableNotifications(newValue);
-        localStorage.setItem('warmane_notifications', JSON.stringify(newValue));
+        localStorage.setItem('relictum_notifications', JSON.stringify(newValue));
     };
 
     const toggleSoundEffects = () => {
         const newValue = !enableSoundEffects;
         setEnableSoundEffects(newValue);
-        localStorage.setItem('warmane_sound_effects', JSON.stringify(newValue));
+        localStorage.setItem('relictum_sound_effects', JSON.stringify(newValue));
     };
 
     const toggleGlowEffects = () => {
         const newValue = !enableGlowEffects;
         setEnableGlowEffects(newValue);
-        localStorage.setItem('warmane_glow_effects', JSON.stringify(newValue));
+        localStorage.setItem('relictum_glow_effects', JSON.stringify(newValue));
     };
 
     const updateDefaultDownloadPath = (path) => {
         setDefaultDownloadPath(path);
-        localStorage.setItem('warmane_default_download_path', path);
+        localStorage.setItem('relictum_default_download_path', path);
     };
 
     return {

@@ -782,6 +782,31 @@ ipcMain.handle('extension-read-image', async (event, filePath) => {
     }
 });
 
+// Persistent settings backup in userData
+ipcMain.handle('settings-read-backup', async () => {
+    try {
+        const backupPath = path.join(app.getPath('userData'), 'settings.json');
+        if (!fs.existsSync(backupPath)) return { success: true, data: {} };
+        const text = fs.readFileSync(backupPath, 'utf8');
+        const data = JSON.parse(text || '{}');
+        return { success: true, data };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('settings-write-backup', async (event, payload) => {
+    try {
+        const backupPath = path.join(app.getPath('userData'), 'settings.json');
+        const dir = path.dirname(backupPath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(backupPath, JSON.stringify(payload || {}, null, 2));
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
     ipcMain.on('extension-download-file', (event, { url, savePath, id }) => {
     try {
         const file = fs.createWriteStream(savePath);

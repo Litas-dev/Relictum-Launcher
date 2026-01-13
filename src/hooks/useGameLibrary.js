@@ -11,7 +11,7 @@ export const useGameLibrary = () => {
     // Load visible games
     useEffect(() => {
         try {
-            const savedVisibleGames = localStorage.getItem('warmane_visible_games');
+            const savedVisibleGames = localStorage.getItem('relictum_visible_games') || localStorage.getItem('warmane_visible_games');
             if (savedVisibleGames) {
                 const parsed = JSON.parse(savedVisibleGames);
                 if (Array.isArray(parsed)) {
@@ -25,13 +25,13 @@ export const useGameLibrary = () => {
 
     // Save visible games
     useEffect(() => {
-        localStorage.setItem('warmane_visible_games', JSON.stringify(visibleGameIds));
+        localStorage.setItem('relictum_visible_games', JSON.stringify(visibleGameIds));
     }, [visibleGameIds]);
 
     // Load game paths
     useEffect(() => {
         const loadPaths = () => {
-            const savedPaths = localStorage.getItem('warmane_game_paths');
+            const savedPaths = localStorage.getItem('relictum_game_paths') || localStorage.getItem('warmane_game_paths');
             if (savedPaths) {
                 setGamePaths(JSON.parse(savedPaths));
             }
@@ -39,9 +39,12 @@ export const useGameLibrary = () => {
 
         loadPaths();
         
-        // Listen for updates from extensions
+        window.addEventListener('relictum-game-paths-updated', loadPaths);
         window.addEventListener('warmane-game-paths-updated', loadPaths);
-        return () => window.removeEventListener('warmane-game-paths-updated', loadPaths);
+        return () => {
+            window.removeEventListener('relictum-game-paths-updated', loadPaths);
+            window.removeEventListener('warmane-game-paths-updated', loadPaths);
+        };
     }, []);
 
     // Listen for game events
@@ -85,7 +88,7 @@ export const useGameLibrary = () => {
     const savePath = (gameId, path) => {
         const newPaths = { ...gamePaths, [gameId]: path };
         setGamePaths(newPaths);
-        localStorage.setItem('warmane_game_paths', JSON.stringify(newPaths));
+        localStorage.setItem('relictum_game_paths', JSON.stringify(newPaths));
     };
 
     const handleLocateGame = async () => {
@@ -99,7 +102,7 @@ export const useGameLibrary = () => {
         const newPaths = { ...gamePaths };
         delete newPaths[activeGameId];
         setGamePaths(newPaths);
-        localStorage.setItem('warmane_game_paths', JSON.stringify(newPaths));
+        localStorage.setItem('relictum_game_paths', JSON.stringify(newPaths));
     };
 
     const launchGame = async (path, { clearCache, autoClose } = {}) => {

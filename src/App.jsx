@@ -87,9 +87,10 @@ function App() {
   // Effect: Subscribe to Extension Store (Music & Custom Games & Sidebar & Default View)
   useEffect(() => {
       try {
-        const forceDash = localStorage.getItem('warmane_force_dashboard_on_reload');
+        const forceDash = localStorage.getItem('relictum_force_dashboard_on_reload') || localStorage.getItem('warmane_force_dashboard_on_reload');
         if (forceDash === '1') {
             setActiveView('dashboard');
+            localStorage.removeItem('relictum_force_dashboard_on_reload');
             localStorage.removeItem('warmane_force_dashboard_on_reload');
         }
       } catch (_) {}
@@ -174,6 +175,47 @@ function App() {
     closeModal
   });
 
+  // Backup/restore of critical settings to persist across reinstall
+  useEffect(() => {
+    const KEY_PREFIXES = ['relictum_', 'warmane_', 'user_profile'];
+    const collectData = () => {
+      const data = {};
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          if (KEY_PREFIXES.some(p => k.startsWith(p))) {
+            data[k] = localStorage.getItem(k);
+          }
+        }
+      } catch (_) {}
+      return data;
+    };
+
+    const restoreMissing = async () => {
+      try {
+        const res = await ipcRenderer.invoke('settings-read-backup');
+        const backup = (res && res.success && res.data) ? res.data : {};
+        Object.keys(backup || {}).forEach(k => {
+          if (localStorage.getItem(k) === null) {
+            localStorage.setItem(k, backup[k]);
+          }
+        });
+      } catch (_) {}
+    };
+
+    const writeBackup = async () => {
+      try {
+        const payload = collectData();
+        await ipcRenderer.invoke('settings-write-backup', payload);
+      } catch (_) {}
+    };
+
+    restoreMissing();
+    const interval = setInterval(writeBackup, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Effect: Handle background music playback and auto-play policies
   useEffect(() => {
     if (audioRef.current) {
@@ -241,12 +283,12 @@ function App() {
 
   // Realmlist Logic
   useEffect(() => {
-    const saved = localStorage.getItem('warmane_saved_realmlists');
+    const saved = localStorage.getItem('relictum_saved_realmlists') || localStorage.getItem('warmane_saved_realmlists');
     if (saved) {
       setSavedRealmlists(JSON.parse(saved));
     }
     
-    const savedNames = localStorage.getItem('warmane_custom_game_names');
+    const savedNames = localStorage.getItem('relictum_custom_game_names') || localStorage.getItem('warmane_custom_game_names');
     if (savedNames) {
       setCustomGameNames(JSON.parse(savedNames));
     }
@@ -269,7 +311,7 @@ function App() {
     };
     
     setCustomGameNames(newNames);
-    localStorage.setItem('warmane_custom_game_names', JSON.stringify(newNames));
+    localStorage.setItem('relictum_custom_game_names', JSON.stringify(newNames));
     setRenameConfig(prev => ({ ...prev, isOpen: false }));
   };
 
@@ -334,7 +376,7 @@ function App() {
     e.stopPropagation();
     const newHistory = savedRealmlists.filter(item => item !== itemToRemove);
     setSavedRealmlists(newHistory);
-    localStorage.setItem('warmane_saved_realmlists', JSON.stringify(newHistory));
+    localStorage.setItem('relictum_saved_realmlists', JSON.stringify(newHistory));
   };
 
   // Handlers: Manage client visibility and default download path
