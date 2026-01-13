@@ -1,9 +1,0 @@
-{
-  "id": "menu_controller",
-  "name": "Menu Controller",
-  "author": "Relictum",
-  "description": "Applies a Steam-like UI theme across all pages via extension (no core changes). Preserves footer icons, cleans up styles on disable, and controls sidebar visibility.",
-  "version": "2.0.0",
-  "main": "menu_controller.js",
-  "image": "image.png"
-}
