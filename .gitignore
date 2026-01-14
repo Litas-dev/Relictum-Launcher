@@ -22,3 +22,6 @@ plugins.json
 src/utils/ExtensionLoader.js
 src/utils/ExtensionStore.js
 extensions/
+
+# Local marketing site assets (ignore)
+domain/

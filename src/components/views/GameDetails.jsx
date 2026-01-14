@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Play, Globe, FolderSearch, Puzzle, Settings, Image as ImageIcon, User, Camera, Palette, Edit } from 'lucide-react';
 import styles from './GameDetails.module.css';
@@ -24,7 +24,7 @@ const GameDetails = ({
   const [gameImages, setGameImages] = useState({});
   const [gameGlow, setGameGlow] = useState(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateActions = () => {
         setExtensionActions([...ExtensionStore.getGameActions()]);
         setExtensionWidgets([...ExtensionStore.getGameDetailsWidgets()]);
@@ -35,13 +35,21 @@ const GameDetails = ({
     return ExtensionStore.subscribe(updateActions);
   }, [activeGameId]);
 
+  useLayoutEffect(() => {
+    setDetectedVersion(null);
+    setIsVersionCompatible(true);
+  }, [activeGameId, currentPath]);
+
   useEffect(() => {
+    let cancelled = false;
     const fetchVersion = async () => {
       if (currentPath) {
         try {
           const version = await ipcRenderer.invoke('get-game-version', currentPath);
+          if (cancelled) return;
           setDetectedVersion(version);
         } catch (error) {
+          if (cancelled) return;
           console.error('Failed to get game version:', error);
           setDetectedVersion(null);
         }
@@ -50,7 +58,8 @@ const GameDetails = ({
       }
     };
     fetchVersion();
-  }, [currentPath]);
+    return () => { cancelled = true; };
+  }, [currentPath, activeGameId]);
 
   useEffect(() => {
     if (currentPath && detectedVersion && activeGame.version) {
