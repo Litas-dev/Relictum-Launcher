@@ -518,17 +518,15 @@ function App() {
       )}
 
       <div className="main-content" style={!isSidebarVisible ? { width: '100%', left: 0 } : {}}>
-        {!hasSidebarOverride && (
-          <TopBar 
-            activeGame={activeGame}
-            serverPing={serverPing}
-            updateInfo={updateInfo}
-            settings={settings}
-            onMinimize={() => ipcRenderer.send('minimize-window')}
-            onMaximize={() => ipcRenderer.send('maximize-window')}
-            onClose={() => ipcRenderer.send('close-window')}
-          />
-        )}
+        <TopBar 
+          activeGame={activeGame}
+          serverPing={serverPing}
+          updateInfo={updateInfo}
+          settings={settings}
+          onMinimize={() => ipcRenderer.send('minimize-window')}
+          onMaximize={() => ipcRenderer.send('maximize-window')}
+          onClose={() => ipcRenderer.send('close-window')}
+        />
 
         <div className="content-area">
           {activeView === 'dashboard' && (
